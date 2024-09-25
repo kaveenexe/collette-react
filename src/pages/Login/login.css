@@ -1,0 +1,18 @@
+.submitButton {
+    right: 10px;
+    /* position:absolute; */
+    bottom:10px;
+}
+
+.formContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.formWrapper {
+    width: 400px;
+    margin-right: auto;
+    position: relative;
+}
