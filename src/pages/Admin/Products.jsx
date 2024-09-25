@@ -63,7 +63,7 @@ const ProductList = () => {
                 <h6 className="card-subtitle mb-2 text-muted">ID: {product.uniqueProductId}</h6>
                 <p className="card-text">{product.description}</p>
                 <div className="d-flex justify-content-between align-items-center">
-                  <span className="text-muted">${product.price.toFixed(2)}</span>
+                  <span className="text-muted">Rs.{product.price.toFixed(2)}</span>
                   <span className="badge bg-secondary">
                     {ProductCategory[product.category] || product.category}
                   </span>
