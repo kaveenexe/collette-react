@@ -1,9 +1,12 @@
 import './App.css';
+import CreateProduct from './components/product/Createproduct';
+import ProductList from './components/product/Producttest'
 
 function App() {
   return (
     <div>
-      <button className='btn btn-primary'>Hi</button>
+      {/* <CreateProduct/> */}
+      <ProductList/>
     </div>
   );
 }
