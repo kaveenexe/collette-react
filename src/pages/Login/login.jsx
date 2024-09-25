@@ -23,7 +23,7 @@ const LoginForm = () => {
 
   return (
     <div>
-        <NavBar />
+    
         <div className="formContainer">
             <div className="formWrapper">
                         

@@ -1,5 +1,6 @@
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
+import { NavLink } from "react-router-dom";
 import Navbar from "react-bootstrap/Navbar";
 import Logo from "../../images/white_logo.jpg";
 
@@ -21,11 +22,20 @@ return (
                 }}
               />
         </Navbar.Brand>
-          <Nav className="me-auto">
-            <Nav.Link href="#home">Home</Nav.Link>
-            <Nav.Link href="#dashboard">Dashboard</Nav.Link>
-            <Nav.Link href="#login">Login</Nav.Link>
-          </Nav>
+        <Nav className="me-auto">
+          <Nav.Link as={NavLink} to="/home">
+            Home
+          </Nav.Link>
+          <Nav.Link as={NavLink} to="/dashboard">
+            Dashboard
+          </Nav.Link>
+          <Nav.Link as={NavLink} to="/login">
+            Login
+          </Nav.Link>
+          <Nav.Link as={NavLink} to="/products">
+            Products
+          </Nav.Link>
+        </Nav>
         </Container>
       </Navbar>
   );

@@ -10,15 +10,22 @@ import Inventory from "./pages/Admin/Inventory";
 import Vendors from "./pages/Admin/Vendors";
 import Products from "./pages/Admin/Products";
 import Settings from "./pages/Admin/Settings";
+import ProductList from "./pages/Admin/Products";
+import Createproduct from "./components/product/Createproduct";
+
 
 function App() {
   return (
     <div>
+      
       <BrowserRouter>
+    
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Dashboard />} />
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/products" element={<ProductList />} />
+          <Route path="/createproduct" element={<Createproduct />} />
 
           <Route path="/dashboard/*" element={<Dashboard />}>
             <Route index element={<DashboardManager />} />
