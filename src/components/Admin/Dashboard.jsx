@@ -18,9 +18,9 @@ const Dashboard = () =>
     <div className="dashboard">
       <SideBar />
       <div className="content">
-          {/* <div className="searchbar">
+          <div className="searchbar">
             <SearchBar onSearch={handleSearch} />
-          </div> */}
+          </div>
         <Outlet />
       </div>
     </div>
