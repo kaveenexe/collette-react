@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link,useNavigate } from 'react-router-dom';
+import { Form, FormControl, Dropdown, InputGroup } from 'react-bootstrap';
 import Apiservice from '../../components/product/Apiservice';
 
 const ProductCategory = {
@@ -8,20 +9,24 @@ const ProductCategory = {
   Trousers: 'Trousers',
   Shorts: 'Shorts',
   Pants: 'Pants',
-  // Add more categories as needed
 };
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
   const userId = "user123";
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const data = await Apiservice.getAllProducts();
         setProducts(data);
+        setFilteredProducts(data);
         setLoading(false);
       } catch (err) {
         setError('Failed to fetch products');
@@ -31,6 +36,14 @@ const ProductList = () => {
 
     fetchProducts();
   }, []);
+
+  useEffect(() => {
+    const results = products.filter(product =>
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      (selectedCategory === 'All' || product.category === selectedCategory)
+    );
+    setFilteredProducts(results);
+  }, [searchTerm, selectedCategory, products]);
 
   if (loading) return (
     <div className="d-flex justify-content-center align-items-center" style={{height: '100vh'}}>
@@ -49,8 +62,8 @@ const ProductList = () => {
   const handleAddToCart = async (product) => {
     try {
       const cartItem = {
-        ProductId: product.id, // Make sure this matches the property name in your Product model
-        ProductName: product.name, // Make sure this matches the property name in your Product model
+        ProductId: product.id,
+        ProductName: product.name,
         Quantity: 1,
         Price: product.price
       };
@@ -62,27 +75,64 @@ const ProductList = () => {
     }
   };
 
+  const handleDeleteProduct = async (productId) => {
+    try {
+      await Apiservice.deleteProduct(productId);
+      setProducts(products.filter(product => product.id !== productId));
+      setFilteredProducts(filteredProducts.filter(product => product.id !== productId));
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      alert('Failed to delete product. Please try again.');
+    }
+  };
+
+  const handleEditProduct = (product) => {
+    navigate('/createproduct', { state: { productToEdit: product } });
+  };
+
   return (
     <div className="container mt-4">
-      <div className="d-flex justify-content-between">
-      <Link to="/createproduct" className="btn btn-primary">
+      <div className="d-flex justify-content-between mb-4">
+        <Link to="/createproduct" className="btn btn-primary">
           Create New Product
         </Link>
         <Link to="/viewcart" className="btn btn-primary">
           View Cart
         </Link>
       </div>
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h1>Products</h1>
-        
-      </div>
+      <h1 className="mb-4">Products</h1>
+      
+      <Form className="mb-4">
+        <InputGroup>
+          <FormControl
+            placeholder="Search products..."
+            aria-label="Search products"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <Dropdown>
+            <Dropdown.Toggle variant="outline-secondary">
+              {selectedCategory}
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Dropdown.Item onClick={() => setSelectedCategory('All')}>All</Dropdown.Item>
+              {Object.entries(ProductCategory).map(([key, value]) => (
+                <Dropdown.Item key={key} onClick={() => setSelectedCategory(key)}>
+                  {value}
+                </Dropdown.Item>
+              ))}
+            </Dropdown.Menu>
+          </Dropdown>
+        </InputGroup>
+      </Form>
+
       <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-        {products.map(product => (
+        {filteredProducts.map(product => (
           <div key={product.id} className="col">
             <div className="card h-100 shadow-sm">
               <div className="card-body">
                 <h5 className="card-title">{product.name}</h5>
-                <h6 className="card-subtitle mb-2 text-muted">ID: {product.uniqueProductId}</h6>
+                <h6 className="card-subtitle mb-2 text-muted">ID : {product.uniqueProductId}</h6>
                 <p className="card-text">{product.description}</p>
                 <div className="d-flex justify-content-between align-items-center">
                   <span className="text-muted">Rs.{product.price.toFixed(2)}</span>
@@ -90,6 +140,8 @@ const ProductList = () => {
                     {ProductCategory[product.category] || product.category}
                   </span>
                   <button className="btn btn-primary" onClick={() => handleAddToCart(product)}>Add to Cart</button>
+                  <button className="btn btn-secondary" onClick={() => handleEditProduct(product)}>Edit</button>
+                  {/* <button className="btn btn-danger" onClick={() => handleDeleteProduct(product.id)}>Delete</button> */}
                 </div>
               </div>
               <div className="card-footer" style={{ backgroundColor: product.stockQuantity < 5 ? '#f8d7da' : '' }}> 

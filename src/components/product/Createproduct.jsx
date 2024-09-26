@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Apiservice from '../../components/product/Apiservice';
 
 const ProductCategory = {
@@ -8,11 +8,11 @@ const ProductCategory = {
   Trousers: 'Trousers',
   Shorts: 'Shorts',
   Pants: 'Pants',
-  // Add more categories as needed
 };
 
-const Createproduct = () => {
+const CreateProduct = () => {
   const [product, setProduct] = useState({
+    id: '',
     uniqueProductId: '',
     name: '',
     description: '',
@@ -25,7 +25,17 @@ const Createproduct = () => {
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const productToEdit = location.state?.productToEdit;
+    if (productToEdit) {
+      setProduct(productToEdit);
+      setIsEditMode(true);
+    }
+  }, [location]);
 
   const validateForm = () => {
     let tempErrors = {};
@@ -57,19 +67,20 @@ const Createproduct = () => {
       setIsSubmitting(true);
       try {
         const productToSend = {
-          uniqueProductId: product.uniqueProductId,
-          name: product.name,
-          description: product.description,
+          ...product,
           price: parseFloat(product.price),
           stockQuantity: parseInt(product.stockQuantity),
-          vendorId: product.vendorId,
-          isActive: product.isActive,
-          category: product.category  // This should now match the enum values
         };
-        await Apiservice.createProduct(productToSend);
+        
+        if (isEditMode) {
+          await Apiservice.updateProduct(product.id, productToSend);
+        } else {
+          await Apiservice.createProduct(productToSend);
+        }
+        
         navigate('/dashboard/products');
       } catch (err) {
-        setErrors({ submit: 'Failed to create product. Please try again.' });
+        setErrors({ submit: `Failed to ${isEditMode ? 'update' : 'create'} product. Please try again.` });
       } finally {
         setIsSubmitting(false);
       }
@@ -78,7 +89,7 @@ const Createproduct = () => {
 
   return (
     <div className="container mt-4">
-      <h1 className="mb-4">Create New Product</h1>
+      <h1 className="mb-4">{isEditMode ? 'Edit Product' : 'Create New Product'}</h1>
       {errors.submit && <div className="alert alert-danger">{errors.submit}</div>}
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
@@ -187,11 +198,11 @@ const Createproduct = () => {
           <label className="form-check-label" htmlFor="isActive">Active</label>
         </div>
         <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
-          {isSubmitting ? 'Creating...' : 'Create Product'}
+          {isSubmitting ? (isEditMode ? 'Updating...' : 'Creating...') : (isEditMode ? 'Update Product' : 'Create Product')}
         </button>
       </form>
     </div>
   );
 };
 
-export default Createproduct;
+export default CreateProduct;
