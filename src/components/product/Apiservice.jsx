@@ -50,7 +50,48 @@ const apiService = {
       console.error(`Error deleting product with id ${id}:`, error);
       throw error;
     }
-  }
+  },
+
+  getCart: async (userId) => {
+    const response = await axios.get(`${API_BASE_URL}/cart/${userId}`);
+    return response.data;
+  },
+
+  addToCart: async (userId, item) => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/cart/${userId}/items`, item);
+      return response.data;
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      throw error;
+    }
+  },
+
+  removeFromCart: async (userId, productId) => {
+    await axios.delete(`${API_BASE_URL}/cart/${userId}/items/${productId}`);
+  },
+
+  updateCartItemQuantity: async (userId, productId, quantity) => {
+    try {
+      const response = await axios.put(`${API_BASE_URL}/cart/${userId}/items/${productId}`,
+        quantity, // Send quantity as a plain value, not an object
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error updating cart item quantity:', error);
+      throw error;
+    }
+  },
+
+
+  clearCart: async (userId) => {
+    await axios.delete(`${API_BASE_URL}/cart/${userId}`);
+  },
 };
 
 export default apiService;

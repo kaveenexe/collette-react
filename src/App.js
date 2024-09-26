@@ -12,6 +12,8 @@ import Products from "./pages/Admin/Products";
 import Settings from "./pages/Admin/Settings";
 import ProductList from "./pages/Admin/Products";
 import Createproduct from "./components/product/Createproduct";
+import Cart from "./pages/Cart/Cart";
+import Viewcart from "./pages/Admin/Viewcart";
 
 
 function App() {
@@ -26,7 +28,8 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/products" element={<ProductList />} />
           <Route path="/createproduct" element={<Createproduct />} />
-
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/viewcart" element={<Viewcart />} />
           <Route path="/dashboard/*" element={<Dashboard />}>
             <Route index element={<DashboardManager />} />
             <Route path="users" element={<Users />} />

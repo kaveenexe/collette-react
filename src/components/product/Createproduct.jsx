@@ -67,7 +67,7 @@ const Createproduct = () => {
           category: product.category  // This should now match the enum values
         };
         await Apiservice.createProduct(productToSend);
-        navigate('/');
+        navigate('/dashboard/products');
       } catch (err) {
         setErrors({ submit: 'Failed to create product. Please try again.' });
       } finally {
