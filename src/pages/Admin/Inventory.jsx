@@ -2,7 +2,8 @@ import React from "react";
 import Header from "../../components/Admin/Header";
 import "./Styles.css";
 
-const Inventory = () => {
+const Inventory = () =>
+{
   return (
     <div className="main-component">
       <Header
