@@ -1,5 +1,5 @@
 .sidebar {
-  width: 270px;
+  width: 290px;
   height: 100vh;
   background-color: #ffffff;
   color: rgb(52, 53, 53);
@@ -22,12 +22,6 @@
   outline: none;
 }
 
-.my-custom-menu-item:hover {
-  background-color: #7490de;
-  cursor: pointer;
-  color: rgb(255, 255, 255);
-}
-
 .my-custom-menu.ant-menu .ant-menu-item {
   color: rgb(52, 52, 52);
 }
@@ -35,4 +29,103 @@
 .my-custom-menu.ant-menu .ant-menu-item-selected {
   background-color: #0652b7 !important;
   color: white !important;
+}
+
+.menu-item-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.menu-icon {
+  margin-right: 1rem;
+  margin-bottom: 0.3rem;
+}
+
+.menu-label {
+  flex-grow: 1;
+  text-align: left;
+  /* Ensure label stays left-aligned */
+}
+
+.sub-menu-label {
+  margin-left: 12px;
+}
+
+.menu-arrow {
+  margin-left: auto;
+  /* Push the arrow icon to the right */
+}
+
+.arrow-icon {
+  font-size: 0.8rem;
+}
+
+/* Custom submenu styles */
+.custom-submenu {
+  background-color: #ffffff;
+  /* Background color for the submenu */
+  font-weight: 400;
+  /* Normal font weight */
+  border-radius: 0.25rem;
+  /* Rounded corners for submenu */
+  margin-left: 25px;
+  margin-right: 0.5px;
+}
+
+/* Unordered list styles in submenu */
+.custom-submenu ul {
+  padding: 0;
+  /* Remove default padding */
+  list-style: none;
+  /* Remove bullet points */
+}
+
+/* List item styles in submenu */
+.custom-submenu li {
+  padding: 12px;
+  /* Padding for submenu items */
+  margin-left: 20px;
+  /* Margin on the left */
+}
+
+/* Submenu item styles */
+.my-custom-submenu-item {
+  font-size: 0.9rem;
+  /* Font size */
+  color: #333;
+  /* Text color */
+  transition: background-color 0.3s ease, padding-left 0.3s ease;
+  /* Transition for hover effects */
+  border-radius: 0.25rem;
+  /* Rounded corners for submenu items */
+  background-color: #c9c9c9;
+}
+
+/* Submenu hover state */
+.my-custom-submenu-item:hover {
+  background-color: #f0f0f0;
+  /* Background color on hover */
+  padding-left: 3rem;
+  /* Increase left padding on hover */
+}
+
+/* Selected submenu item */
+.my-custom-submenu-item-selected {
+  background-color: #0652b7 !important;
+  color: white !important;
+}
+
+/* Main menu item styles */
+.my-custom-menu-item {
+  padding: 1rem;
+  /* Padding for main menu items */
+  transition: background-color 0.3s ease;
+  /* Transition for hover effects */
+}
+
+/* Main menu item hover state */
+.my-custom-menu-item:hover {
+  background-color: #f0f0f0;
 }
