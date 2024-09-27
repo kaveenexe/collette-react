@@ -4,11 +4,11 @@ import Login from "./pages/Login/login";
 import Dashboard from "./components/Admin/Dashboard";
 import Users from "./pages/Admin/Users";
 import DashboardManager from "./pages/Admin/DashboardManager";
-import OrderList from "./pages/Admin/Order/Orders";
-import CreateOrder from "./pages/Admin/Order/CreateOrder";
-import CancelOrders from "./pages/Admin/Order/CancelOrders";
-import UpdateOrder from "./pages/Admin/Order/UpdateOrder";
-import Inventory from "./pages/Admin/Inventory";
+// import OrderList from "./pages/Admin/Order/Orders";
+// import CreateOrder from "./pages/Admin/Order/CreateOrder";
+// import CancelOrders from "./pages/Admin/Order/CancelOrders";
+// import UpdateOrder from "./pages/Admin/Order/UpdateOrder";
+import Inventory from "./pages/Admin/Inventory/Inventory";
 import Categories from "./pages/Admin/Categories";
 import Vendors from "./pages/Admin/Vendors";
 import Products from "./pages/Admin/Products";
@@ -32,10 +32,10 @@ function App() {
             <Route path="users" element={<Users />} />
             <Route path="products" element={<Products />} />
             <Route path="categories" element={<Categories />} />
-            <Route path="orders" element={<OrderList />} />
+            {/* <Route path="orders" element={<OrderList />} />
             <Route path="create-order" element={<CreateOrder />} />
             <Route path="update-order" element={<UpdateOrder />} />
-            <Route path="cancel-orders" element={<CancelOrders />} />
+            <Route path="cancel-orders" element={<CancelOrders />} /> */}
             <Route path="inventory" element={<Inventory />} />
             <Route path="vendors" element={<Vendors />} />
             <Route path="settings" element={<Settings />} />
