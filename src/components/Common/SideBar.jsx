@@ -142,7 +142,7 @@ const SideBar = () => {
         alt="Logo"
         style={{
           width: "15.5rem",
-          marginRight: "0.8rem",
+          marginLeft: "0.5rem",
           marginBottom: "0.8rem",
         }}
       />

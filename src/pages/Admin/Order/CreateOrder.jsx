@@ -8,7 +8,7 @@ import visaImage from "../../../images/visa.png";
 import mastercardImage from "../../../images/master.png";
 import codImage from "../../../images/cod.png"; 
 import { FaSearch, FaPlus, FaMinus, FaTrash } from "react-icons/fa";
-import "../OrderStyles.css";
+import "./OrderStyles.css";
 
 const CreateOrder = () => {
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
@@ -148,7 +148,7 @@ const CreateOrder = () => {
       {/* Wrapping both Customer and Order Details into a single Row */}
       <Row>
         {/* Customer Details in one column */}
-        <Col md={6}>
+        <Col md={5}>
           <div className="form-container">
             <h4 className="cd-name">Order Details</h4>
             <Row>
@@ -202,181 +202,188 @@ const CreateOrder = () => {
         </Col>
 
         {/* Order Details in another column */}
-        <Col md={6}>
-          <div className="form-container">
-            <h4 className="cd-name">Billing Details</h4>
-            <Row>
-              <Col md={12}>
-                <Form>
-                  {/* Street Address */}
-                  <Form.Group className="mb-4" controlId="nameInput">
-                    <Form.Label>Street Address</Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="address"
-                      value={formInputs.address}
-                      onChange={handleInputChange}
-                      placeholder="Enter your street address"
-                    />
-                  </Form.Group>
+        <Col md={5}>
+          <div className="form-container-double">
+            <div className="form-container">
+              <h4 className="cd-name">Billing Details</h4>
+              <Row>
+                <Col md={12}>
+                  <Form>
+                    {/* Street Address */}
+                    <Form.Group className="mb-4" controlId="nameInput">
+                      <Form.Label>Street Address</Form.Label>
+                      <Form.Control
+                        type="text"
+                        name="address"
+                        value={formInputs.address}
+                        onChange={handleInputChange}
+                        placeholder="Enter your street address"
+                      />
+                    </Form.Group>
 
-                  {/* City and Province in One Row */}
-                  <Row>
-                    <Col md={6}>
-                      <Form.Group className="mb-4" controlId="cityInput">
-                        <Form.Label>City</Form.Label>
-                        <Form.Select
-                          name="city"
-                          value={formInputs.city}
-                          onChange={handleInputChange}
+                    {/* City and Province in One Row */}
+                    <Row>
+                      <Col md={6}>
+                        <Form.Group className="mb-4" controlId="cityInput">
+                          <Form.Label>City</Form.Label>
+                          <Form.Select
+                            name="city"
+                            value={formInputs.city}
+                            onChange={handleInputChange}
+                          >
+                            <option>Select City</option>
+                            <option value="Jaffna">Jaffna</option>
+                            <option value="Kilinochchi">Kilinochchi</option>
+                            <option value="Mannar">Mannar</option>
+                            <option value="Mullaitivu">Mullaitivu</option>
+                            <option value="Vavuniya">Vavuniya</option>
+                            <option value="Jaffna">Jaffna</option>
+                            <option value="Puttalam">Puttalam</option>
+                            <option value="Kurunegala">Kurunegala</option>
+                            <option value="Gampaha">Gampaha</option>
+                            <option value="Colombo">Colombo</option>
+                            <option value="Kalutara">Kalutara</option>
+                            <option value="Anuradhapura">Anuradhapura</option>
+                            <option value="Polonnaruwa">Polonnaruwa</option>
+                            <option value="Matale">Matale</option>
+                            <option value="Kandy">Kandy</option>
+                            <option value="Nuwara Eliya">Nuwara Eliya</option>
+                            <option value="Kegalle">Kegalle</option>
+                            <option value="Ratnapura">Ratnapura</option>
+                            <option value="Trincomalee">Trincomalee</option>
+                            <option value="Batticaloa">Batticaloa</option>
+                            <option value="Ampara">Ampara</option>
+                            <option value="Badulla">Badulla</option>
+                            <option value="Monaragala">Monaragala</option>
+                            <option value="Hambantota">Hambantota</option>
+                            <option value="Matara">Matara</option>
+                            <option value="Galle">Galle</option>
+                          </Form.Select>
+                        </Form.Group>
+                      </Col>
+                      <Col md={6}>
+                        <Form.Group className="mb-4" controlId="provinceInput">
+                          <Form.Label>Province</Form.Label>
+                          <Form.Select
+                            name="province"
+                            value={formInputs.province}
+                            onChange={handleInputChange}
+                          >
+                            <option>Select Province</option>
+                            <option value="Western">Western</option>
+                            <option value="Central">Central</option>
+                            <option value="Southern">Southern</option>
+                            <option value="Northern">Northern</option>
+                            <option value="Eastern">Eastern</option>
+                            <option value="North Western">North Western</option>
+                            <option value="North Central">North Central</option>
+                            <option value="Uva">Uva</option>
+                            <option value="Sabaragamuwa">Sabaragamuwa</option>
+                          </Form.Select>
+                        </Form.Group>
+                      </Col>
+                    </Row>
+
+                    {/* Postal Code and Country in One Row */}
+                    <Row>
+                      <Col md={6}>
+                        <Form.Group
+                          className="mb-4"
+                          controlId="postalCodeInput"
                         >
-                          <option>Select City</option>
-                          <option value="Jaffna">Jaffna</option>
-                          <option value="Kilinochchi">Kilinochchi</option>
-                          <option value="Mannar">Mannar</option>
-                          <option value="Mullaitivu">Mullaitivu</option>
-                          <option value="Vavuniya">Vavuniya</option>
-                          <option value="Jaffna">Jaffna</option>
-                          <option value="Puttalam">Puttalam</option>
-                          <option value="Kurunegala">Kurunegala</option>
-                          <option value="Gampaha">Gampaha</option>
-                          <option value="Colombo">Colombo</option>
-                          <option value="Kalutara">Kalutara</option>
-                          <option value="Anuradhapura">Anuradhapura</option>
-                          <option value="Polonnaruwa">Polonnaruwa</option>
-                          <option value="Matale">Matale</option>
-                          <option value="Kandy">Kandy</option>
-                          <option value="Nuwara Eliya">Nuwara Eliya</option>
-                          <option value="Kegalle">Kegalle</option>
-                          <option value="Ratnapura">Ratnapura</option>
-                          <option value="Trincomalee">Trincomalee</option>
-                          <option value="Batticaloa">Batticaloa</option>
-                          <option value="Ampara">Ampara</option>
-                          <option value="Badulla">Badulla</option>
-                          <option value="Monaragala">Monaragala</option>
-                          <option value="Hambantota">Hambantota</option>
-                          <option value="Matara">Matara</option>
-                          <option value="Galle">Galle</option>
-                        </Form.Select>
-                      </Form.Group>
-                    </Col>
-                    <Col md={6}>
-                      <Form.Group className="mb-4" controlId="provinceInput">
-                        <Form.Label>Province</Form.Label>
-                        <Form.Select
-                          name="province"
-                          value={formInputs.province}
-                          onChange={handleInputChange}
+                          <Form.Label>Postal Code</Form.Label>
+                          <Form.Control
+                            type="text"
+                            name="pcode"
+                            value={formInputs.pcode}
+                            onChange={handleInputChange}
+                            placeholder="Enter your postal code"
+                          />
+                        </Form.Group>
+                      </Col>
+                      <Col md={6}>
+                        <Form.Group className="mb-4" controlId="countryInput">
+                          <Form.Label>Country</Form.Label>
+                          <Form.Control
+                            type="text"
+                            name="country"
+                            value={formInputs.country}
+                            onChange={handleInputChange}
+                            placeholder="Sri Lanka"
+                            disabled // You can disable this if the country is always Sri Lanka
+                          />
+                        </Form.Group>
+                      </Col>
+                    </Row>
+                  </Form>
+                </Col>
+              </Row>
+            </div>
+            <div className="form-container">
+              <h4 className="cd-name">Payment Details</h4>
+              <Row>
+                <Col md={12}>
+                  <Form>
+                    <Form.Group className="mb-4" controlId="paymentOptions">
+                      <Form.Label>Select Payment Method</Form.Label>
+                      <div className="payment-options">
+                        {/* Visa Option */}
+                        <div
+                          className={`payment-card ${
+                            selectedPaymentMethod === "Visa" ? "selected" : ""
+                          }`}
+                          onClick={() => handlePaymentMethodChange("Visa")}
                         >
-                          <option>Select Province</option>
-                          <option value="Western">Western</option>
-                          <option value="Central">Central</option>
-                          <option value="Southern">Southern</option>
-                          <option value="Northern">Northern</option>
-                          <option value="Eastern">Eastern</option>
-                          <option value="North Western">North Western</option>
-                          <option value="North Central">North Central</option>
-                          <option value="Uva">Uva</option>
-                          <option value="Sabaragamuwa">Sabaragamuwa</option>
-                        </Form.Select>
-                      </Form.Group>
-                    </Col>
-                  </Row>
+                          <img
+                            src={visaImage}
+                            alt="Visa"
+                            style={{ width: "50px", marginRight: "11px" }}
+                          />
+                          <span>Visa</span>
+                        </div>
 
-                  {/* Postal Code and Country in One Row */}
-                  <Row>
-                    <Col md={6}>
-                      <Form.Group className="mb-4" controlId="postalCodeInput">
-                        <Form.Label>Postal Code</Form.Label>
-                        <Form.Control
-                          type="text"
-                          name="pcode"
-                          value={formInputs.pcode}
-                          onChange={handleInputChange}
-                          placeholder="Enter your postal code"
-                        />
-                      </Form.Group>
-                    </Col>
-                    <Col md={6}>
-                      <Form.Group className="mb-4" controlId="countryInput">
-                        <Form.Label>Country</Form.Label>
-                        <Form.Control
-                          type="text"
-                          name="country"
-                          value={formInputs.country}
-                          onChange={handleInputChange}
-                          placeholder="Sri Lanka"
-                          disabled // You can disable this if the country is always Sri Lanka
-                        />
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                </Form>
-              </Col>
-            </Row>
-          </div>
-          <div className="form-container">
-            <h4 className="cd-name">Payment Details</h4>
-            <Row>
-              <Col md={12}>
-                <Form>
-                  <Form.Group className="mb-4" controlId="paymentOptions">
-                    <Form.Label>Select Payment Method</Form.Label>
-                    <div className="payment-options">
-                      {/* Visa Option */}
-                      <div
-                        className={`payment-card ${
-                          selectedPaymentMethod === "Visa" ? "selected" : ""
-                        }`}
-                        onClick={() => handlePaymentMethodChange("Visa")}
-                      >
-                        <img
-                          src={visaImage}
-                          alt="Visa"
-                          style={{ width: "50px", marginRight: "11px" }}
-                        />
-                        <span>Visa</span>
-                      </div>
+                        {/* MasterCard Option */}
+                        <div
+                          className={`payment-card ${
+                            selectedPaymentMethod === "MasterCard"
+                              ? "selected"
+                              : ""
+                          }`}
+                          onClick={() =>
+                            handlePaymentMethodChange("MasterCard")
+                          }
+                        >
+                          <img
+                            src={mastercardImage}
+                            alt="MasterCard"
+                            style={{ width: "50px", marginRight: "11px" }}
+                          />
+                          <span>MasterCard</span>
+                        </div>
 
-                      {/* MasterCard Option */}
-                      <div
-                        className={`payment-card ${
-                          selectedPaymentMethod === "MasterCard"
-                            ? "selected"
-                            : ""
-                        }`}
-                        onClick={() => handlePaymentMethodChange("MasterCard")}
-                      >
-                        <img
-                          src={mastercardImage}
-                          alt="MasterCard"
-                          style={{ width: "50px", marginRight: "11px" }}
-                        />
-                        <span>MasterCard</span>
+                        {/* COD Option */}
+                        <div
+                          className={`payment-card ${
+                            selectedPaymentMethod === "COD" ? "selected" : ""
+                          }`}
+                          onClick={() => handlePaymentMethodChange("COD")}
+                        >
+                          <img
+                            src={codImage}
+                            alt="Cash on Delivery"
+                            style={{
+                              width: "50px",
+                              marginRight: "11px",
+                            }}
+                          />
+                          <span>COD</span>
+                        </div>
                       </div>
-
-                      {/* COD Option */}
-                      <div
-                        className={`payment-card ${
-                          selectedPaymentMethod === "COD" ? "selected" : ""
-                        }`}
-                        onClick={() => handlePaymentMethodChange("COD")}
-                      >
-                        <img
-                          src={codImage}
-                          alt="Cash on Delivery"
-                          style={{
-                            width: "50px",
-                            marginRight: "11px",
-                          }}
-                        />
-                        <span>COD</span>
-                      </div>
-                    </div>
-                  </Form.Group>
-                </Form>
-              </Col>
-            </Row>
+                    </Form.Group>
+                  </Form>
+                </Col>
+              </Row>
+            </div>
           </div>
         </Col>
       </Row>

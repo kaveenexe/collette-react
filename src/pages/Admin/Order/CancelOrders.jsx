@@ -1,6 +1,6 @@
 import React from "react";
 import Header from "../../../components/Common/Header";
-import "../OrderStyles.css";
+import "./OrderStyles.css";
 import { FaEye } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
 
