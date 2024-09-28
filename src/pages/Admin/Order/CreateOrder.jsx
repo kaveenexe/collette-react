@@ -3,7 +3,7 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Alert from "react-bootstrap/Alert";
-import Header from "../../../components/Admin/Header";
+import Header from "../../../components/Common/Header";
 import visaImage from "../../../images/visa.png";
 import mastercardImage from "../../../images/master.png";
 import codImage from "../../../images/cod.png"; 
