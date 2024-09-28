@@ -5,10 +5,10 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login/login";
 import Dashboard from "./components/Common/Dashboard"; // Layout component
 import Users from "./pages/Admin/Users";
-// import OrderList from "./pages/Admin/Order/Orders";
-// import CreateOrder from "./pages/Admin/Order/CreateOrder";
-// import CancelOrders from "./pages/Admin/Order/CancelOrders";
-// import UpdateOrder from "./pages/Admin/Order/UpdateOrder";
+import OrderList from "./pages/Admin/Order/Orders";
+import CreateOrder from "./pages/Admin/Order/CreateOrder";
+import CancelOrders from "./pages/Admin/Order/CancelOrders";
+import UpdateOrder from "./pages/Admin/Order/UpdateOrder";
 import Inventory from "./pages/Admin/Inventory/Inventory";
 import Categories from "./pages/Admin/Categories";
 import Vendors from "./pages/Vendor/Vendors";
@@ -26,11 +26,11 @@ function App() {
         <Route path="/login" element={<Login />} />
 
         {/* Root route */}
-        <Route 
-          path="/" 
+        <Route
+          path="/"
           element={
             user ? <Navigate to="/dashboard" /> : <Navigate to="/login" />
-          } 
+          }
         />
 
         {/* Dashboard layout route */}
@@ -80,7 +80,31 @@ function App() {
             path="orders"
             element={
               <ProtectedRoute allowedRoles={["Vendor", "Administrator"]}>
-                <Orders />
+                <OrderList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="create-order"
+            element={
+              <ProtectedRoute allowedRoles={["Vendor", "Administrator"]}>
+                <CreateOrder />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="update-order"
+            element={
+              <ProtectedRoute allowedRoles={["Vendor", "Administrator"]}>
+                <UpdateOrder />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="cancel-orders"
+            element={
+              <ProtectedRoute allowedRoles={["Vendor", "Administrator"]}>
+                <CancelOrders />
               </ProtectedRoute>
             }
           />
