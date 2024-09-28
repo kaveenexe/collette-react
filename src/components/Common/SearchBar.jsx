@@ -4,7 +4,7 @@ import {FaSearch} from "react-icons/fa";
 const SearchBar = ({ onSearch }) => {
   return (
     <div
-      style={{ margin: "20px 0", display: "flex", justifyContent: "center" }}
+      style={{ margin: "20px", display: "flex", justifyContent: "center" }}
     >
       <input
         type="text"
@@ -12,7 +12,7 @@ const SearchBar = ({ onSearch }) => {
         onChange={(event) => onSearch(event.target.value)}
         style={{
           padding: "10px",
-          width: "400px",
+          width: "415px",
           borderRadius: "5px",
           border: "1px solid #ccc",
         }}

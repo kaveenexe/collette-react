@@ -1,6 +1,6 @@
 import React from "react";
 import Header from "../../../components/Common/Header";
-import "../OrderStyles.css";
+import "./OrderStyles.css";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaPen, FaTrash } from "react-icons/fa"; // Importing the FontAwesome icons
 
