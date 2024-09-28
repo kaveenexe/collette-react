@@ -15,6 +15,7 @@ import Vendors from "./pages/Admin/Vendors";
 import Products from "./pages/Admin/Products";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Unauthorized from "./pages/Unauthorized/page";
+import Orders from "./pages/Vendor/Orders";
 
 function App() {
   const { user } = useContext(AuthContext);
