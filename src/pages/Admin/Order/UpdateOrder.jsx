@@ -3,7 +3,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
-import Header from "../../../components/Admin/Header";
+import Header from "../../../components/Common/Header";
 import "../OrderStyles.css";
 
 const UpdateOrder = () => {
