@@ -1,68 +1,69 @@
-import React, { useState } from "react";
-import { Form, Button } from "react-bootstrap";
-import NavBar from "../../components/NavBar/navbar";
-import "./login.css";
+import React, { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { AuthContext } from "../../context/AuthContext"; // Import AuthContext for managing user login
 
-const LoginForm = () => {
-  const [email, setEmail] = useState("");
+const LoginPage = () => {
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const { login } = useContext(AuthContext); // Get login function from AuthContext
+  const navigate = useNavigate();
 
-  const handleEmailChange = (e) => {
-    setEmail(e.target.value);
-  };
-
-  const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
-  };
-
-  const handleSubmit = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // Add your logic for handling the form data here
-    console.log("Submitted:", { email, password });
+
+    try {
+      // Send login request to the backend
+      const response = await axios.post(
+        "https://localhost:7001/api/auth/login",
+        {
+          username,
+          password,
+        }
+      );
+
+      // Extract token and user data from the response
+      const { token, userId, firstName, lastName, role, email, address, nic } = response.data;
+
+      // Save user data in AuthContext
+      login({ userId, firstName, lastName, role, email, address, nic }, token);
+
+      // Redirect to the dashboard or any other protected page
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Login failed:", error);
+      setErrorMessage("Invalid username or password. Please try again.");
+    }
   };
 
   return (
-    <div>
-    
-        <div className="formContainer">
-            <div className="formWrapper">
-                        
-                        <Form onSubmit={handleSubmit}>
-                        <Form.Group controlId="formBasicEmail">
-                        <Form.Label>Email address</Form.Label>
-                        <Form.Control
-                            type="email"
-                            placeholder="Enter email"
-                            value={email}
-                            onChange={handleEmailChange}
-                        />
-                        </Form.Group>
-                        <div>
-
-                        <Form.Group controlId="formBasicPassword">
-                        <Form.Label>Password</Form.Label>
-                        <Form.Control
-                            type="password"
-                            placeholder="Password"
-                            value={password}
-                            onChange={handlePasswordChange}
-                        />
-                        </Form.Group>
-                        
-                        </div>
-
-                        {/* <Form.Group controlId="formBasicCheckbox">
-                        <Form.Check type="checkbox" label="Check me out" />
-                        </Form.Group> */}
-                        <Button className="submitButton" variant="primary" type="submit">
-                        Submit
-                        </Button>
-                        
-                        </Form>
-            </div>
+    <div className="login-container">
+      <h2>Login</h2>
+      {errorMessage && <div className="error-message">{errorMessage}</div>}
+      <form onSubmit={handleLogin}>
+        <div>
+          <label>Username:</label>
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
         </div>
+        <div>
+          <label>Password:</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+        <button type="submit">Login</button>
+      </form>
     </div>
   );
 };
 
-export default LoginForm;
+export default LoginPage;

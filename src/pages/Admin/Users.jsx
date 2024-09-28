@@ -1,4 +1,4 @@
-import Header from "../../components/Admin/Header";
+import Header from "../../components/Common/Header";
 import React from "react";
 
 function Users() {
