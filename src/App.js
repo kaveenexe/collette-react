@@ -11,7 +11,7 @@ import Users from "./pages/Admin/Users";
 // import UpdateOrder from "./pages/Admin/Order/UpdateOrder";
 import Inventory from "./pages/Admin/Inventory/Inventory";
 import Categories from "./pages/Admin/Categories";
-import Vendors from "./pages/Admin/Vendors";
+import Vendors from "./pages/Vendor/Vendors";
 import Products from "./pages/Admin/Products";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Unauthorized from "./pages/Unauthorized/page";
