@@ -1,9 +1,10 @@
 import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "./context/AuthContext";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login/login";
-import Dashboard from "./components/Admin/Dashboard";
+import Dashboard from "./components/Common/Dashboard"; // Layout component
 import Users from "./pages/Admin/Users";
-import DashboardManager from "./pages/Admin/DashboardManager";
 // import OrderList from "./pages/Admin/Order/Orders";
 // import CreateOrder from "./pages/Admin/Order/CreateOrder";
 // import CancelOrders from "./pages/Admin/Order/CancelOrders";
@@ -12,36 +13,82 @@ import Inventory from "./pages/Admin/Inventory/Inventory";
 import Categories from "./pages/Admin/Categories";
 import Vendors from "./pages/Admin/Vendors";
 import Products from "./pages/Admin/Products";
-import Settings from "./pages/Admin/Settings";
-import ProductList from "./pages/Admin/Products";
-import Createproduct from "./components/product/Createproduct";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Unauthorized from "./pages/Unauthorized/page";
+import Orders from "./pages/Vendor/Orders";
 
 function App() {
+  const { user } = useContext(AuthContext);
   return (
     <div>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/products" element={<ProductList />} />
-          <Route path="/createproduct" element={<Createproduct />} />
+      <Routes>
+        {/* Public route */}
+        <Route path="/login" element={<Login />} />
 
-          <Route path="/dashboard/*" element={<Dashboard />}>
-            <Route index element={<DashboardManager />} />
-            <Route path="users" element={<Users />} />
-            <Route path="products" element={<Products />} />
-            <Route path="categories" element={<Categories />} />
-            {/* <Route path="orders" element={<OrderList />} />
-            <Route path="create-order" element={<CreateOrder />} />
-            <Route path="update-order" element={<UpdateOrder />} />
-            <Route path="cancel-orders" element={<CancelOrders />} /> */}
-            <Route path="inventory" element={<Inventory />} />
-            <Route path="vendors" element={<Vendors />} />
-            <Route path="settings" element={<Settings />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+        {/* Root route */}
+        <Route 
+          path="/" 
+          element={
+            user ? <Navigate to="/dashboard" /> : <Navigate to="/login" />
+          } 
+        />
+
+        {/* Dashboard layout route */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        >
+          {/* Nested routes under the dashboard layout */}
+
+          <Route
+            path="users"
+            element={
+              <ProtectedRoute allowedRoles={["Administrator"]}>
+                <Users />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="inventory"
+            element={
+              <ProtectedRoute allowedRoles={["Administrator"]}>
+                <Inventory />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="vendors"
+            element={
+              <ProtectedRoute allowedRoles={["Administrator"]}>
+                <Vendors />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="products"
+            element={
+              <ProtectedRoute allowedRoles={["Administrator", "Vendor"]}>
+                <Products />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="orders"
+            element={
+              <ProtectedRoute allowedRoles={["Vendor", "Administrator"]}>
+                <Orders />
+              </ProtectedRoute>
+            }
+          />
+        </Route>
+
+        {/* Unauthorized route */}
+        <Route path="/unauthorized" element={<Unauthorized />} />
+      </Routes>
     </div>
   );
 }

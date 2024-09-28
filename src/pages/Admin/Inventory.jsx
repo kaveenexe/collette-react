@@ -2,16 +2,16 @@ import React from "react";
 import Header from "../../components/Common/Header";
 import "./Styles.css";
 
-const Vendors = () => {
+const Inventory = () => {
   return (
     <div className="main-component">
       <Header
-        title="Vendor Management"
-        subtitle="Foster vendor relationships by managing accounts and feedback effectively."
+        title="Inventory Management"
+        subtitle="Monitor inventory levels and receive alerts for low stock to prevent shortages."
       />
       <br />
     </div>
   );
 };
 
-export default Vendors;
+export default Inventory;
