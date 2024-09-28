@@ -5,8 +5,12 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login/login";
 import Dashboard from "./components/Common/Dashboard"; // Layout component
 import Users from "./pages/Admin/Users";
-import Orders from "./pages/Admin/Orders";
-import Inventory from "./pages/Admin/Inventory";
+// import OrderList from "./pages/Admin/Order/Orders";
+// import CreateOrder from "./pages/Admin/Order/CreateOrder";
+// import CancelOrders from "./pages/Admin/Order/CancelOrders";
+// import UpdateOrder from "./pages/Admin/Order/UpdateOrder";
+import Inventory from "./pages/Admin/Inventory/Inventory";
+import Categories from "./pages/Admin/Categories";
 import Vendors from "./pages/Admin/Vendors";
 import Products from "./pages/Admin/Products";
 import ProtectedRoute from "./components/ProtectedRoute";
