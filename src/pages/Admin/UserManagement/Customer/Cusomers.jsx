@@ -13,7 +13,7 @@ const Customers = () => {
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const response = await axios.get("https://localhost:7001/api/users/customers");
+        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/users/customers`);
         setCustomers(response.data); // Set customers in state
       } catch (error) {
         console.error("Error fetching customers:", error);
@@ -38,7 +38,7 @@ const Customers = () => {
       console.log("Sending payload:", payload); // Log the payload being sent
   
       // Make the PUT request to update the customer status
-      await axios.put(`https://localhost:7001/api/users/${customerId}`, payload);
+      await axios.put(`${process.env.REACT_APP_API_BASE_URL}/api/users/${customerId}`, payload);
   
       // Update status in the UI after successful update
       setCustomers((prevCustomers) =>

@@ -6,6 +6,7 @@ import { AuthContext } from "../../context/AuthContext"; // Import AuthContext
 import AdminDashboard from "../MainDashboards/AdminDashboard";
 import VendorDashboard from "../MainDashboards/VendorDashboard";
 import CSRDashboard from "../MainDashboards/CSRDashboard";
+import Notification from "./Notification";
 import "./Dashboard.css";
 
 const Dashboard = () => {
@@ -36,9 +37,17 @@ const Dashboard = () => {
     <div className="dashboard">
       <SideBar />
       <div className="content">
+        
         <div className="searchbar">
           <SearchBar onSearch={handleSearch} />
         </div>
+        
+        {/* Conditionally render Notification only for CSR */}
+        {user?.role === "CSR" && (
+          <div className="notification">
+            <Notification />
+          </div>
+        )}
 
         {/* Only render the role-specific dashboard on the main /dashboard route */}
         {location.pathname === "/dashboard" && renderDashboardContent()}
