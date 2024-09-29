@@ -7,8 +7,8 @@ const CSRDashboard = () => {
     
     return(
         <div>
-            <h2>Admin Dashboard</h2>
-            <p>Welcome, Admin! You have full access to manage the platform.</p>
+            <h2>CSR Dashboard</h2>
+            <p>Welcome, CSR! You have full access to manage the platform.</p>
             
             <p>First Name: {user.firstName}</p>
             <p>Last Name: {user.lastName}</p>
