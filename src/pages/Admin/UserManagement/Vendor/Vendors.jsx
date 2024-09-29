@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Header from "../../components/Common/Header";
+import Header from "../../../../components/Common/Header";
 import { FaPen, FaTrash } from "react-icons/fa";
 import "./Vendors.css"; // Import the custom stylesheet
 
@@ -25,7 +25,9 @@ const Vendors = () => {
   useEffect(() => {
     const fetchVendors = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/users/vendors`);
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_BASE_URL}/api/users/vendors`
+        );
         setVendors(response.data); // Set the fetched vendors in state
       } catch (error) {
         console.error("Error fetching vendors:", error);
@@ -103,12 +105,13 @@ const Vendors = () => {
       }
 
       // Refetch vendors after adding/updating
-      const updatedVendors = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/users/vendors`);
+      const updatedVendors = await axios.get(
+        `${process.env.REACT_APP_API_BASE_URL}/api/users/vendors`
+      );
       setVendors(updatedVendors.data); // Update the vendors list
 
       setShowModal(false); // Close the modal after submission
       resetForm(); // Reset form fields
-
     } catch (error) {
       setErrorMessage("Error saving vendor. Please try again.");
       console.error("Error saving vendor:", error);
@@ -128,10 +131,7 @@ const Vendors = () => {
           <div className="d-flex justify-content-between">
             <h5>Vendor List</h5>
             {/* Button to open modal for adding new vendor */}
-            <button
-              className="btn btn-danger mr-5"
-              onClick={() => openModal()}
-            >
+            <button className="btn btn-danger mr-5" onClick={() => openModal()}>
               Add Vendor
             </button>
           </div>
@@ -139,7 +139,6 @@ const Vendors = () => {
             <table className="table table-bordered mt-3">
               <thead className="table-dark">
                 <tr>
-                  
                   <th>Vendor Name</th>
                   <th>Email</th>
                   <th>NIC</th>
@@ -152,19 +151,31 @@ const Vendors = () => {
                 {vendors.length > 0 ? (
                   vendors.map((vendor) => (
                     <tr key={vendor.id}>
-                      
-                      <td>{vendor.firstName} {vendor.lastName}</td>
+                      <td>
+                        {vendor.firstName} {vendor.lastName}
+                      </td>
                       <td>{vendor.email}</td>
                       <td>{vendor.nic}</td>
                       <td>{vendor.address}</td>
                       <td>
-                        <span className={`badge ${vendor.isActive ? 'bg-success' : 'bg-danger'}`}>
+                        <span
+                          className={`badge ${
+                            vendor.isActive ? "bg-success" : "bg-danger"
+                          }`}
+                        >
                           {vendor.isActive ? "Active" : "Inactive"}
                         </span>
                       </td>
                       <td>
-                        <button className="btn btn-sm" onClick={() => openModal(vendor)}><FaPen/></button>
-                        <button className="btn btn-sm"><FaTrash/></button>
+                        <button
+                          className="btn btn-sm"
+                          onClick={() => openModal(vendor)}
+                        >
+                          <FaPen />
+                        </button>
+                        <button className="btn btn-sm">
+                          <FaTrash />
+                        </button>
                       </td>
                     </tr>
                   ))
@@ -187,7 +198,9 @@ const Vendors = () => {
           <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">{editingVendor ? "Edit Vendor" : "Add New Vendor"}</h5>
+                <h5 className="modal-title">
+                  {editingVendor ? "Edit Vendor" : "Add New Vendor"}
+                </h5>
                 <button
                   type="button"
                   className="btn-close"
@@ -203,7 +216,9 @@ const Vendors = () => {
                 )}
                 <form onSubmit={handleSubmit}>
                   <div className="mb-3">
-                    <label htmlFor="nic" className="form-label">NIC</label>
+                    <label htmlFor="nic" className="form-label">
+                      NIC
+                    </label>
                     <input
                       type="text"
                       id="nic"
@@ -215,7 +230,9 @@ const Vendors = () => {
                     />
                   </div>
                   <div className="mb-3">
-                    <label htmlFor="email" className="form-label">Email</label>
+                    <label htmlFor="email" className="form-label">
+                      Email
+                    </label>
                     <input
                       type="email"
                       id="email"
@@ -227,7 +244,9 @@ const Vendors = () => {
                     />
                   </div>
                   <div className="mb-3">
-                    <label htmlFor="firstName" className="form-label">First Name</label>
+                    <label htmlFor="firstName" className="form-label">
+                      First Name
+                    </label>
                     <input
                       type="text"
                       id="firstName"
@@ -238,7 +257,9 @@ const Vendors = () => {
                     />
                   </div>
                   <div className="mb-3">
-                    <label htmlFor="lastName" className="form-label">Last Name</label>
+                    <label htmlFor="lastName" className="form-label">
+                      Last Name
+                    </label>
                     <input
                       type="text"
                       id="lastName"
@@ -249,7 +270,9 @@ const Vendors = () => {
                     />
                   </div>
                   <div className="mb-3">
-                    <label htmlFor="username" className="form-label">Username</label>
+                    <label htmlFor="username" className="form-label">
+                      Username
+                    </label>
                     <input
                       type="text"
                       id="username"
@@ -261,7 +284,9 @@ const Vendors = () => {
                   </div>
                   {!editingVendor && (
                     <div className="mb-3">
-                      <label htmlFor="password" className="form-label">Password</label>
+                      <label htmlFor="password" className="form-label">
+                        Password
+                      </label>
                       <input
                         type="password"
                         id="password"
@@ -273,7 +298,9 @@ const Vendors = () => {
                     </div>
                   )}
                   <div className="mb-3">
-                    <label htmlFor="address" className="form-label">Address</label>
+                    <label htmlFor="address" className="form-label">
+                      Address
+                    </label>
                     <input
                       type="text"
                       id="address"
@@ -284,7 +311,9 @@ const Vendors = () => {
                     />
                   </div>
                   <div className="mb-3">
-                    <label htmlFor="status" className="form-label">Status</label>
+                    <label htmlFor="status" className="form-label">
+                      Status
+                    </label>
                     <select
                       id="status"
                       className="form-control"

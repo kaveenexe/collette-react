@@ -13,7 +13,9 @@ import {
 import { MdOutlineWarehouse, MdOutlineDashboard } from "react-icons/md";
 import { PiDress } from "react-icons/pi";
 import { IoBusinessOutline } from "react-icons/io5";
+import { FaBuildingUser } from "react-icons/fa6";
 import { BsDiagram3 } from "react-icons/bs";
+import { FaUsers } from "react-icons/fa";
 import { Menu } from "antd";
 import { AuthContext } from "../../context/AuthContext"; // Import AuthContext
 
@@ -78,12 +80,29 @@ const SideBar = () => {
         icon: <MdOutlineWarehouse className="fs-4" />,
         label: "Inventory",
       },
-    user &&
+      user &&
       user.role === "Administrator" && {
-        key: "vendors", // Unique key for Vendors menu
-        icon: <IoBusinessOutline className="fs-4" />,
-        label: "Vendors",
+        key: "admin-management",
+        icon: <AiOutlineUserAdd className="fs-4" />,
+        label: "Admin Management",
+        subItems: [
+          {
+            key: "vendor-management",
+            label: "Vendor Management",
+          },
+          {
+            key: "csr-management",
+            label: "CSR Management",
+          },
+        ],
       },
+    user &&
+    (user.role === "Administrator" || user.role === "CSR") && {
+        key: "customer-management",
+        icon: <FaUsers className="fs-4" />,
+        label: "Customer Management",
+      },
+      
     {
       key: "settings",
       icon: <AiOutlineSetting className="fs-4" />,
@@ -116,7 +135,7 @@ const SideBar = () => {
         handleNavigation("orders"); // Navigate to orders
       }
     } else if (key === "signout") {
-      // Perform logout operation
+      logout();
     } else if (key === "dashboard") {
       navigate("/dashboard");
     } else {

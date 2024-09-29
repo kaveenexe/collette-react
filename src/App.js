@@ -11,7 +11,8 @@ import CancelOrders from "./pages/Admin/Order/CancelOrders";
 import UpdateOrder from "./pages/Admin/Order/UpdateOrder";
 import Inventory from "./pages/Admin/Inventory/Inventory";
 import Categories from "./pages/Admin/Categories";
-import Vendors from "./pages/Vendor/Vendors";
+import Vendors from "./pages/Admin/UserManagement/Vendor/Vendors";
+import Customers from "./pages/Admin/UserManagement/Customer/Cusomers";
 import Products from "./pages/Admin/Products";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Unauthorized from "./pages/Unauthorized/page";
@@ -61,10 +62,18 @@ function App() {
             }
           />
           <Route
-            path="vendors"
+            path="vendor-management"
             element={
               <ProtectedRoute allowedRoles={["Administrator"]}>
                 <Vendors />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="customer-management"
+            element={
+              <ProtectedRoute allowedRoles={["Administrator", "CSR"]}>
+                <Customers />
               </ProtectedRoute>
             }
           />
