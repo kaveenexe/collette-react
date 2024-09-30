@@ -1,5 +1,5 @@
 import React from "react";
-import Header from "../../components/Admin/Header";
+import Header from "../../components/Common/Header";
 import "./Styles.css";
 
 const Inventory = () => {

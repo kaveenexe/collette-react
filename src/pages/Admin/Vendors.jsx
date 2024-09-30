@@ -1,6 +1,5 @@
 import React from "react";
-import Header from "../../components/Admin/Header";
-import "./Styles.css";
+import Header from "../../components/Common/Header";
 
 const Vendors = () => {
   return (
