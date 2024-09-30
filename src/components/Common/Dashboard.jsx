@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import SideBar from "./SideBar";
-import SearchBar from "./SearchBar";
+import Navigation from "./Navigation";
 import { AuthContext } from "../../context/AuthContext"; // Import AuthContext
 import AdminDashboard from "../MainDashboards/AdminDashboard";
 import VendorDashboard from "../MainDashboards/VendorDashboard";
@@ -38,8 +38,8 @@ const Dashboard = () => {
       <SideBar />
       <div className="content">
         
-        <div className="searchbar">
-          <SearchBar onSearch={handleSearch} />
+        <div className="navigation">
+          <Navigation />
         </div>
         
         {/* Conditionally render Notification only for CSR */}

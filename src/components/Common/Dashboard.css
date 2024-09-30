@@ -1,12 +1,10 @@
 .content {
   margin-left: 290px;
-  margin-top: -730px;
+  margin-top: -101vh;
 }
 
-.searchbar{
-  margin-top: 53px;
-  margin-left: -790px;
-  margin-bottom: -18px;
+.navigation{
+background-color: blueviolet;
 }
 
 .notification {
