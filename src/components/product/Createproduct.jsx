@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useContext } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Apiservice from '../../components/product/Apiservice';
+import { AuthContext } from "../../context/AuthContext";
 
 const ProductCategory = {
   Shirts: 'Shirts',
@@ -8,24 +9,35 @@ const ProductCategory = {
   Trousers: 'Trousers',
   Shorts: 'Shorts',
   Pants: 'Pants',
-  // Add more categories as needed
 };
 
-const Createproduct = () => {
+const CreateProduct = () => {
+  const { user } = useContext(AuthContext);
+  const vendorId = user.userId;
   const [product, setProduct] = useState({
     uniqueProductId: '',
     name: '',
     description: '',
     price: '',
     stockQuantity: '',
-    vendorId: '',
     isActive: true,
-    category: ''
+    category: '',
+    vendorId: vendorId  // CHANGE: Include vendorId in initial state
   });
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const productToEdit = location.state?.productToEdit;
+    if (productToEdit) {
+      setProduct(productToEdit);
+      setIsEditMode(true);
+    }
+  }, [location]);
 
   const validateForm = () => {
     let tempErrors = {};
@@ -37,7 +49,6 @@ const Createproduct = () => {
     else if (isNaN(product.stockQuantity) || !Number.isInteger(Number(product.stockQuantity)) || Number(product.stockQuantity) < 0) {
       tempErrors.stockQuantity = "Stock quantity must be a non-negative integer";
     }
-    if (!product.vendorId.trim()) tempErrors.vendorId = "Vendor ID is required";
     if (!product.category) tempErrors.category = "Category is required";
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
@@ -57,19 +68,23 @@ const Createproduct = () => {
       setIsSubmitting(true);
       try {
         const productToSend = {
-          uniqueProductId: product.uniqueProductId,
-          name: product.name,
-          description: product.description,
+          ...product,
           price: parseFloat(product.price),
           stockQuantity: parseInt(product.stockQuantity),
-          vendorId: product.vendorId,
-          isActive: product.isActive,
-          category: product.category  // This should now match the enum values
         };
-        await Apiservice.createProduct(productToSend);
-        navigate('/');
+        
+        console.log('Sending product data:', productToSend); // For debugging
+  
+        if (isEditMode) {
+          await Apiservice.updateProduct(vendorId, product.id, productToSend);
+        } else {
+          await Apiservice.createProduct(vendorId, productToSend);
+        }
+        
+        navigate('/dashboard/products');
       } catch (err) {
-        setErrors({ submit: 'Failed to create product. Please try again.' });
+        console.error('Error submitting product:', err);
+        setErrors({ submit: `Failed to ${isEditMode ? 'update' : 'create'} product. Please try again.` });
       } finally {
         setIsSubmitting(false);
       }
@@ -78,7 +93,7 @@ const Createproduct = () => {
 
   return (
     <div className="container mt-4">
-      <h1 className="mb-4">Create New Product</h1>
+      <h1 className="mb-4">{isEditMode ? 'Edit Product' : 'Create New Product'}</h1>
       {errors.submit && <div className="alert alert-danger">{errors.submit}</div>}
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
@@ -148,15 +163,14 @@ const Createproduct = () => {
         <div className="mb-3">
           <label htmlFor="vendorId" className="form-label">Vendor ID</label>
           <input
+          disabled
             type="text"
-            className={`form-control ${errors.vendorId ? 'is-invalid' : ''}`}
+            className="form-control"
             id="vendorId"
             name="vendorId"
-            value={product.vendorId}
-            onChange={handleChange}
-            required
+            value={vendorId}
+            readOnly
           />
-          {errors.vendorId && <div className="invalid-feedback">{errors.vendorId}</div>}
         </div>
         <div className="mb-3">
           <label htmlFor="category" className="form-label">Category</label>
@@ -187,11 +201,11 @@ const Createproduct = () => {
           <label className="form-check-label" htmlFor="isActive">Active</label>
         </div>
         <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
-          {isSubmitting ? 'Creating...' : 'Create Product'}
+          {isSubmitting ? (isEditMode ? 'Updating...' : 'Creating...') : (isEditMode ? 'Update Product' : 'Create Product')}
         </button>
       </form>
     </div>
   );
 };
 
-export default Createproduct;
+export default CreateProduct;

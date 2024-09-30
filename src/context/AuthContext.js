@@ -25,6 +25,7 @@ export const AuthProvider = ({ children }) => {
     });
     setToken(jwtToken);
     localStorage.setItem('user', JSON.stringify(userData)); // Store user data in local storage
+    console.log()
     localStorage.setItem('token', jwtToken); // Store JWT token
   };
 

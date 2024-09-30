@@ -17,6 +17,7 @@ import Products from "./pages/Admin/Products";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Unauthorized from "./pages/Unauthorized/page";
 import Orders from "./pages/Admin/Order/Orders";
+import Createproduct from "./components/product/Createproduct";
 
 function App() {
   const { user } = useContext(AuthContext);
@@ -25,6 +26,15 @@ function App() {
       <Routes>
         {/* Public route */}
         <Route path="/login" element={<Login />} />
+        <Route
+        
+            path="/createproduct"
+            element={
+              <ProtectedRoute allowedRoles={["Vendor","Administrator"]}>
+                <Createproduct />
+                </ProtectedRoute>
+            }
+          />
 
         {/* Root route */}
         <Route
@@ -117,8 +127,9 @@ function App() {
               </ProtectedRoute>
             }
           />
+         
         </Route>
-
+          
         {/* Unauthorized route */}
         <Route path="/unauthorized" element={<Unauthorized />} />
       </Routes>
