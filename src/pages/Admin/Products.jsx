@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Link,useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Form, FormControl, Dropdown, InputGroup } from 'react-bootstrap';
 import Apiservice from '../../components/product/Apiservice';
+import { AuthContext } from "../../context/AuthContext";
 
 const ProductCategory = {
   Shirts: 'Shirts',
@@ -18,13 +19,15 @@ const ProductList = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const userId = "user123";
   const navigate = useNavigate();
+
+  const { user } = useContext(AuthContext);
+  const vendorId = user.userId;
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const data = await Apiservice.getAllProducts();
+        const data = await Apiservice.getAllProducts(vendorId);
         setProducts(data);
         setFilteredProducts(data);
         setLoading(false);
@@ -35,7 +38,7 @@ const ProductList = () => {
     };
 
     fetchProducts();
-  }, []);
+  }, [vendorId]);
 
   useEffect(() => {
     const results = products.filter(product =>
@@ -59,25 +62,9 @@ const ProductList = () => {
     </div>
   );
 
-  const handleAddToCart = async (product) => {
-    try {
-      const cartItem = {
-        ProductId: product.id,
-        ProductName: product.name,
-        Quantity: 1,
-        Price: product.price
-      };
-      await Apiservice.addToCart(userId, cartItem);
-      alert('Product added to cart!');
-    } catch (error) {
-      console.error('Error adding to cart:', error);
-      alert('Failed to add product to cart. Please try again.');
-    }
-  };
-
   const handleDeleteProduct = async (productId) => {
     try {
-      await Apiservice.deleteProduct(productId);
+      await Apiservice.deleteProduct(vendorId, productId);
       setProducts(products.filter(product => product.id !== productId));
       setFilteredProducts(filteredProducts.filter(product => product.id !== productId));
     } catch (error) {
@@ -95,9 +82,6 @@ const ProductList = () => {
       <div className="d-flex justify-content-between mb-4">
         <Link to="/createproduct" className="btn btn-primary">
           Create New Product
-        </Link>
-        <Link to="/viewcart" className="btn btn-primary">
-          View Cart
         </Link>
       </div>
       <h1 className="mb-4">Products</h1>
@@ -139,9 +123,8 @@ const ProductList = () => {
                   <span className="badge bg-secondary">
                     {ProductCategory[product.category] || product.category}
                   </span>
-                  <button className="btn btn-primary" onClick={() => handleAddToCart(product)}>Add to Cart</button>
                   <button className="btn btn-secondary" onClick={() => handleEditProduct(product)}>Edit</button>
-                  {/* <button className="btn btn-danger" onClick={() => handleDeleteProduct(product.id)}>Delete</button> */}
+                  <button className="btn btn-danger" onClick={() => handleDeleteProduct(product.id)}>Delete</button>
                 </div>
               </div>
               <div className="card-footer" style={{ backgroundColor: product.stockQuantity < 5 ? '#f8d7da' : '' }}> 

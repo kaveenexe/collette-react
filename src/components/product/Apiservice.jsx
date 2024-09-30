@@ -2,10 +2,43 @@ import axios from 'axios';
 
 const API_BASE_URL = 'https://localhost:7001/api';
 
+// Create an axios instance
+const axiosInstance = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Add a request interceptor
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Add a response interceptor
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      // Redirect to login page or refresh token
+      localStorage.removeItem('token');
+      window.location = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
 const apiService = {
-  getAllProducts: async () => {
+  getAllProducts: async (vendorId) => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/products`);
+      const response = await axiosInstance.get(`/products?vendorId=${vendorId}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -13,39 +46,33 @@ const apiService = {
     }
   },
 
-  getProductById: async (id) => {
+  createProduct: async (vendorId, productData) => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/products/${id}`);
+      console.log('Creating product for vendor:', vendorId);
+      console.log('Product data:', productData);
+      const response = await axiosInstance.post(`/products?vendorId=${vendorId}`, productData);
       return response.data;
     } catch (error) {
-      console.error(`Error fetching product with id ${id}:`, error);
+      console.error('Error creating product:', error.response?.data || error.message);
       throw error;
     }
   },
 
-  createProduct: async (productData) => {
+  updateProduct: async (vendorId, id, productData) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/products`, productData);
+      console.log('Updating product for vendor:', vendorId);
+      console.log('Product data:', productData);
+      const response = await axiosInstance.put(`/products/${id}?vendorId=${vendorId}`, productData);
       return response.data;
     } catch (error) {
-      console.error('Error creating product:', error);
+      console.error(`Error updating product with id ${id}:`, error.response?.data || error.message);
       throw error;
     }
   },
 
-  updateProduct: async (id, productData) => {
+  deleteProduct: async (vendorId, id) => {
     try {
-      const response = await axios.put(`${API_BASE_URL}/products/${id}`, productData);
-      return response.data;
-    } catch (error) {
-      console.error(`Error updating product with id ${id}:`, error);
-      throw error;
-    }
-  },
-
-  deleteProduct: async (id) => {
-    try {
-      await axios.delete(`${API_BASE_URL}/products/${id}`);
+      await axiosInstance.delete(`/products/${id}?vendorId=${vendorId}`);
     } catch (error) {
       console.error(`Error deleting product with id ${id}:`, error);
       throw error;

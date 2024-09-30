@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Apiservice from '../../components/product/Apiservice';
+import { AuthContext } from "../../context/AuthContext";
 
 const ProductCategory = {
   Shirts: 'Shirts',
@@ -11,16 +12,17 @@ const ProductCategory = {
 };
 
 const CreateProduct = () => {
+  const { user } = useContext(AuthContext);
+  const vendorId = user.userId;
   const [product, setProduct] = useState({
-    id: '',
     uniqueProductId: '',
     name: '',
     description: '',
     price: '',
     stockQuantity: '',
-    vendorId: '',
     isActive: true,
-    category: ''
+    category: '',
+    vendorId: vendorId  // CHANGE: Include vendorId in initial state
   });
 
   const [errors, setErrors] = useState({});
@@ -47,7 +49,6 @@ const CreateProduct = () => {
     else if (isNaN(product.stockQuantity) || !Number.isInteger(Number(product.stockQuantity)) || Number(product.stockQuantity) < 0) {
       tempErrors.stockQuantity = "Stock quantity must be a non-negative integer";
     }
-    if (!product.vendorId.trim()) tempErrors.vendorId = "Vendor ID is required";
     if (!product.category) tempErrors.category = "Category is required";
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
@@ -72,14 +73,17 @@ const CreateProduct = () => {
           stockQuantity: parseInt(product.stockQuantity),
         };
         
+        console.log('Sending product data:', productToSend); // For debugging
+  
         if (isEditMode) {
-          await Apiservice.updateProduct(product.id, productToSend);
+          await Apiservice.updateProduct(vendorId, product.id, productToSend);
         } else {
-          await Apiservice.createProduct(productToSend);
+          await Apiservice.createProduct(vendorId, productToSend);
         }
         
         navigate('/dashboard/products');
       } catch (err) {
+        console.error('Error submitting product:', err);
         setErrors({ submit: `Failed to ${isEditMode ? 'update' : 'create'} product. Please try again.` });
       } finally {
         setIsSubmitting(false);
@@ -159,15 +163,14 @@ const CreateProduct = () => {
         <div className="mb-3">
           <label htmlFor="vendorId" className="form-label">Vendor ID</label>
           <input
+          disabled
             type="text"
-            className={`form-control ${errors.vendorId ? 'is-invalid' : ''}`}
+            className="form-control"
             id="vendorId"
             name="vendorId"
-            value={product.vendorId}
-            onChange={handleChange}
-            required
+            value={vendorId}
+            readOnly
           />
-          {errors.vendorId && <div className="invalid-feedback">{errors.vendorId}</div>}
         </div>
         <div className="mb-3">
           <label htmlFor="category" className="form-label">Category</label>
