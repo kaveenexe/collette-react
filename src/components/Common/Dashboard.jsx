@@ -1,13 +1,12 @@
 import React, { useState, useContext } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import SideBar from "./SideBar";
-import SearchBar from "./SearchBar";
+import NavBar from "./Navigation"; // Import the NavBar component
 import { AuthContext } from "../../context/AuthContext"; // Import AuthContext
 import AdminDashboard from "../MainDashboards/AdminDashboard";
 import VendorDashboard from "../MainDashboards/VendorDashboard";
 import CSRDashboard from "../MainDashboards/CSRDashboard";
-import Notification from "./Notification";
-import "./Dashboard.css";
+import "./Dashboard.css"; // Add relevant styles here
 
 const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -37,17 +36,8 @@ const Dashboard = () => {
     <div className="dashboard">
       <SideBar />
       <div className="content">
-        
-        <div className="searchbar">
-          <SearchBar onSearch={handleSearch} />
-        </div>
-        
-        {/* Conditionally render Notification only for CSR */}
-        {user?.role === "CSR" && (
-          <div className="notification">
-            <Notification />
-          </div>
-        )}
+        {/* Add the new NavBar */}
+        <NavBar onSearch={handleSearch} user={user} />
 
         {/* Only render the role-specific dashboard on the main /dashboard route */}
         {location.pathname === "/dashboard" && renderDashboardContent()}
