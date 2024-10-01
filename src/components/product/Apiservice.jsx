@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://localhost:7001/api';
+// const API_BASE_URL = 'https://localhost:7001/api';
 
 // Create an axios instance
 const axiosInstance = axios.create({
-  baseURL: API_BASE_URL,
+  
   headers: {
     'Content-Type': 'application/json',
   },
@@ -38,7 +38,7 @@ axiosInstance.interceptors.response.use(
 const apiService = {
   getAllProducts: async (vendorId) => {
     try {
-      const response = await axiosInstance.get(`/products?vendorId=${vendorId}`);
+      const response = await axiosInstance.get(`${process.env.REACT_APP_API_BASE_URL}/api/products?vendorId=${vendorId}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -50,7 +50,7 @@ const apiService = {
     try {
       console.log('Creating product for vendor:', vendorId);
       console.log('Product data:', productData);
-      const response = await axiosInstance.post(`/products?vendorId=${vendorId}`, productData);
+      const response = await axiosInstance.post(`${process.env.REACT_APP_API_BASE_URL}/api/products?vendorId=${vendorId}`, productData);
       return response.data;
     } catch (error) {
       console.error('Error creating product:', error.response?.data || error.message);
@@ -62,7 +62,7 @@ const apiService = {
     try {
       console.log('Updating product for vendor:', vendorId);
       console.log('Product data:', productData);
-      const response = await axiosInstance.put(`/products/${id}?vendorId=${vendorId}`, productData);
+      const response = await axiosInstance.put(`${process.env.REACT_APP_API_BASE_URL}/api/products/${id}?vendorId=${vendorId}`, productData);
       return response.data;
     } catch (error) {
       console.error(`Error updating product with id ${id}:`, error.response?.data || error.message);
@@ -72,53 +72,53 @@ const apiService = {
 
   deleteProduct: async (vendorId, id) => {
     try {
-      await axiosInstance.delete(`/products/${id}?vendorId=${vendorId}`);
+      await axiosInstance.delete(`${process.env.REACT_APP_API_BASE_URL}/api/products/${id}?vendorId=${vendorId}`);
     } catch (error) {
       console.error(`Error deleting product with id ${id}:`, error);
       throw error;
     }
   },
 
-  getCart: async (userId) => {
-    const response = await axios.get(`${API_BASE_URL}/cart/${userId}`);
-    return response.data;
-  },
+  // getCart: async (userId) => {
+  //   const response = await axios.get(`${API_BASE_URL}/cart/${userId}`);
+  //   return response.data;
+  // },
 
-  addToCart: async (userId, item) => {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/cart/${userId}/items`, item);
-      return response.data;
-    } catch (error) {
-      console.error('Error adding to cart:', error);
-      throw error;
-    }
-  },
+  // addToCart: async (userId, item) => {
+  //   try {
+  //     const response = await axios.post(`${API_BASE_URL}/cart/${userId}/items`, item);
+  //     return response.data;
+  //   } catch (error) {
+  //     console.error('Error adding to cart:', error);
+  //     throw error;
+  //   }
+  // },
 
-  removeFromCart: async (userId, productId) => {
-    await axios.delete(`${API_BASE_URL}/cart/${userId}/items/${productId}`);
-  },
+  // removeFromCart: async (userId, productId) => {
+  //   await axios.delete(`${API_BASE_URL}/cart/${userId}/items/${productId}`);
+  // },
 
-  updateCartItemQuantity: async (userId, productId, quantity) => {
-    try {
-      const response = await axios.put(`${API_BASE_URL}/cart/${userId}/items/${productId}`,
-        quantity, // Send quantity as a plain value, not an object
-        {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-      return response.data;
-    } catch (error) {
-      console.error('Error updating cart item quantity:', error);
-      throw error;
-    }
-  },
+  // updateCartItemQuantity: async (userId, productId, quantity) => {
+  //   try {
+  //     const response = await axios.put(`${API_BASE_URL}/cart/${userId}/items/${productId}`,
+  //       quantity, // Send quantity as a plain value, not an object
+  //       {
+  //         headers: {
+  //           'Content-Type': 'application/json'
+  //         }
+  //       }
+  //     );
+  //     return response.data;
+  //   } catch (error) {
+  //     console.error('Error updating cart item quantity:', error);
+  //     throw error;
+  //   }
+  // },
 
 
-  clearCart: async (userId) => {
-    await axios.delete(`${API_BASE_URL}/cart/${userId}`);
-  },
+  // clearCart: async (userId) => {
+  //   await axios.delete(`${API_BASE_URL}/cart/${userId}`);
+  // },
 };
 
 export default apiService;

@@ -16,113 +16,118 @@ import { PiUsersThree } from "react-icons/pi";
 import { BsDiagram3 } from "react-icons/bs";
 import { FaUsers } from "react-icons/fa";
 import { Menu } from "antd";
-import { AuthContext } from "../../context/AuthContext"; // Import AuthContext
+import { AuthContext } from "../../context/AuthContext";
 
 const SideBar = () => {
   const navigate = useNavigate();
-  const { user, logout } = useContext(AuthContext); // Get user and logout from AuthContext
-  const location = useLocation(); // Use location to track current path
+  const { user, logout } = useContext(AuthContext);
+  const location = useLocation();
   const [expandedMenus, setExpandedMenus] = useState({});
   const [selectedKey, setSelectedKey] = useState("");
 
-  // Define menu items conditionally based on user role
-  const menuItems = [
+  // Menu items
+  const getMenuItems = () => [
     {
-      key: "dashboard", // Unique key for each item
+      key: "dashboard",
       icon: <MdOutlineDashboard className="fs-4" />,
       label: "Dashboard",
+      visible: true,
     },
-    user &&
-      user.role === "Administrator" && {
-        key: "users", // Unique key for Users menu
-        icon: <AiOutlineUserAdd className="fs-4" />,
-        label: "Users",
-      },
-    user &&
-      (user.role === "Administrator" || user.role === "Vendor") && {
-        key: "products", // Unique key for Products menu
-        icon: <PiDress className="fs-4" />,
-        label: "Products",
-      },
-    user &&
-      user.role === "Administrator" && {
-        key: "categories", // Unique key for Categories menu
-        icon: <BsDiagram3 className="fs-4" />,
-        label: "Categories",
-      },
-    user &&
-      (user.role === "Administrator" || user.role === "Vendor") && {
-        key: "orders", // Unique key for Orders menu
-        icon: <AiOutlineShoppingCart className="fs-4" />,
-        label: "Orders",
-        subItems: [
-          // Only 'Administrator' and 'Vendor' can create orders
-          (user.role === "Administrator" || user.role === "Vendor") && {
-            key: "create-order",
-            label: "New Order",
-          },
-          // Only 'Administrator' and 'Vendor' can update orders
-          (user.role === "Administrator" || user.role === "Vendor") && {
-            key: "update-order",
-            label: "Update Orders",
-          },
-          // Both 'Administrator' and 'Vendor' can cancel orders
-          (user.role === "Administrator" || user.role === "Vendor") && {
-            key: "cancel-orders",
-            label: "Cancel Orders",
-          },
-        ].filter(Boolean), // Filter out any false/null values to ensure no invalid entries
-      },
-    user &&
-      user.role === "Administrator" && {
-        key: "inventory", // Unique key for Inventory menu
-        icon: <MdOutlineWarehouse className="fs-4" />,
-        label: "Inventory",
-      },
-    user &&
-      user.role === "Administrator" && {
-        key: "admin-management",
-        icon: <AiOutlineUserAdd className="fs-4" />,
-        label: "Admin Management",
-        subItems: [
-          {
-            key: "vendor-management",
-            label: "Vendor Management",
-          },
-          {
-            key: "csr-management",
-            label: "CSR Management",
-          },
-        ],
-      },
-    user &&
-      (user.role === "Administrator" || user.role === "CSR") && {
-        key: "customer-management",
-        icon: <PiUsersThree className="fs-4" />,
-        label: "Customer Management",
-      },
-
+    {
+      key: "users",
+      icon: <AiOutlineUserAdd className="fs-4" />,
+      label: "Users",
+      visible: user && user.role === "Administrator",
+    },
+    {
+      key: "products",
+      icon: <PiDress className="fs-4" />,
+      label: "Products",
+      visible: user && (user.role === "Administrator" || user.role === "Vendor"),
+    },
+    {
+      key: "categories",
+      icon: <BsDiagram3 className="fs-4" />,
+      label: "Categories",
+      visible: user && user.role === "Administrator",
+    },
+    {
+      key: "orders",
+      icon: <AiOutlineShoppingCart className="fs-4" />,
+      label: "Orders",
+      visible: user && (user.role === "Administrator" || user.role === "Vendor"),
+      subItems: [
+        {
+          key: "create-order",
+          label: "New Order",
+          visible: user && (user.role === "Administrator" || user.role === "Vendor"),
+        },
+        {
+          key: "update-order",
+          label: "Update Orders",
+          visible: user && (user.role === "Administrator" || user.role === "Vendor"),
+        },
+        {
+          key: "cancel-orders",
+          label: "Cancel Orders",
+          visible: user && (user.role === "Administrator" || user.role === "Vendor"),
+        },
+      ],
+    },
+    {
+      key: "inventory",
+      icon: <MdOutlineWarehouse className="fs-4" />,
+      label: "Inventory",
+      visible: user && user.role === "Administrator",
+    },
+    {
+      key: "admin-management",
+      icon: <AiOutlineUserAdd className="fs-4" />,
+      label: "Admin Management",
+      visible: user && user.role === "Administrator",
+      subItems: [
+        {
+          key: "vendor-management",
+          label: "Vendor Management",
+          visible: true,
+        },
+        {
+          key: "csr-management",
+          label: "CSR Management",
+          visible: true,
+        },
+      ],
+    },
+    {
+      key: "customer-management",
+      icon: <FaUsers className="fs-4" />,
+      label: "Customer Management",
+      visible: user && (user.role === "Administrator" || user.role === "CSR"),
+    },
     {
       key: "settings",
       icon: <AiOutlineSetting className="fs-4" />,
       label: "Settings",
+      visible: true,
     },
     {
-      key: "signout", // Unique key for Logout
+      key: "signout",
       icon: <AiOutlineLogout className="fs-4" />,
       label: "Logout",
+      visible: true,
     },
   ];
 
-  // Common navigation handler
+  // Filter visible menu items
+  const visibleMenuItems = getMenuItems().filter(item => item.visible);
+
   const handleNavigation = (key) => {
-    setSelectedKey(key); // Update selected key
-    navigate(`/dashboard/${key}`); // Navigate to the specified route
+    setSelectedKey(key);
+    navigate(`/dashboard/${key}`);
   };
 
-  // Toggle submenu visibility and handle navigation
   const handleMenuClick = (key) => {
-    const selectedItem = menuItems.find((item) => item.key === key);
+    const selectedItem = visibleMenuItems.find((item) => item.key === key);
 
     if (selectedItem?.subItems) {
       setExpandedMenus((prevState) => ({
@@ -143,15 +148,13 @@ const SideBar = () => {
     }
   };
 
-  // Handle submenu click and navigation
   const handleSubMenuClick = (key) => {
-    handleNavigation(key); // Use common navigation handler
+    handleNavigation(key);
   };
 
-  // Effect to set selected key based on the current route
   useEffect(() => {
-    const currentPath = location.pathname.split("/").pop(); // Get the last part of the path
-    setSelectedKey(currentPath); // Set the selected key based on current path
+    const currentPath = location.pathname.split("/").pop();
+    setSelectedKey(currentPath);
   }, [location.pathname]);
 
   return (
@@ -171,7 +174,7 @@ const SideBar = () => {
         defaultSelectedKeys={[""]}
         className="my-custom-menu"
       >
-        {menuItems.map((item) => (
+        {visibleMenuItems.map((item) => (
           <React.Fragment key={item.key}>
             <Menu.Item
               key={item.key}
@@ -179,13 +182,8 @@ const SideBar = () => {
               onClick={() => handleMenuClick(item.key)}
             >
               <div className="menu-item-content">
-                {/* Icon */}
                 <span className="menu-icon">{item.icon}</span>
-
-                {/* Label */}
                 <span className="menu-label">{item.label}</span>
-
-                {/* Arrow for sub-items */}
                 {item.subItems && (
                   <span className="menu-arrow">
                     {expandedMenus[item.key] ? (
@@ -198,10 +196,9 @@ const SideBar = () => {
               </div>
             </Menu.Item>
 
-            {/* Dynamic Submenu */}
             {item.subItems && expandedMenus[item.key] && (
               <div className="custom-submenu">
-                {item.subItems.map((subItem) => (
+                {item.subItems.filter(subItem => subItem.visible).map((subItem) => (
                   <Menu.Item
                     key={subItem.key}
                     className={`my-custom-submenu-item ${
