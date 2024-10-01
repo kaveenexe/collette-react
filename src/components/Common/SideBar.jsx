@@ -12,8 +12,7 @@ import {
 } from "react-icons/ai";
 import { MdOutlineWarehouse, MdOutlineDashboard } from "react-icons/md";
 import { PiDress } from "react-icons/pi";
-import { IoBusinessOutline } from "react-icons/io5";
-import { FaBuildingUser } from "react-icons/fa6";
+import { PiUsersThree } from "react-icons/pi";
 import { BsDiagram3 } from "react-icons/bs";
 import { FaUsers } from "react-icons/fa";
 import { Menu } from "antd";
@@ -135,9 +134,10 @@ const SideBar = () => {
         ...prevState,
         [key]: !prevState[key],
       }));
-      // If submenu is opened, navigate to orders page
-      if (!expandedMenus[key]) {
-        handleNavigation("orders"); // Navigate to orders
+
+      // No need to navigate if it's a submenu, just expand/collapse
+      if (!expandedMenus[key] && key === "orders") {
+        handleNavigation("orders"); // Navigate to orders only
       }
     } else if (key === "signout") {
       logout();

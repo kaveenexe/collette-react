@@ -1,13 +1,148 @@
 .content {
   margin-left: 290px;
-  margin-top: -101vh;
+  margin-top: -704px;
+  width: auto;
 }
 
-.navigation{
-background-color: blueviolet;
+.searchbar {
+  margin-left: 2px;
+  margin-bottom: -15px;
 }
 
 .notification {
   margin-left: 70rem;
   font-size: 1rem;
+}
+
+/* NavBar.css */
+.navbar {
+  position: fixed;
+  /* Keeps the navbar fixed in place */
+  top: 0;
+  height: 82px;
+  /* Ensures it stays at the top of the page */
+  left: 300px;
+  /* Align to the left edge */
+  width: 1270px;
+  /* Make the navbar span the entire width */
+  margin-left: -32px;
+  /* Retain the existing margin */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #ffffff;
+  /* Retain existing background color */
+  border-bottom: 1px solid #e7e7e7;
+  /* Retain existing border */
+  z-index: 1000;
+  /* Ensure it stays above other elements */
+}
+
+.content {
+  margin-top: -610px;
+  /* Adjust margin to avoid overlap with the fixed navbar */
+}
+
+.searchbar {
+  flex: 1;
+  /* Takes the available space */
+}
+
+.navbar-items {
+  margin-top: 0;
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.navbar-icon {
+  width: 35px;
+  height: auto;
+}
+
+.notification-icon {
+  position: relative;
+  font-size: 25px;
+  color: #555;
+  cursor: pointer;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -5.5px;
+  right: -4px;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 12px;
+}
+
+.profile-picture {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-profile-img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+@media screen and (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .navbar-items {
+    justify-content: flex-end;
+    width: 100%;
+  }
+
+  .searchbar {
+    width: 100%;
+  }
+
+  .profile-picture img {
+    width: 55px;
+    height: 55px;
+  }
+}
+
+/* SearchBar.css */
+.search-bar-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 400px;
+  margin-top: -12px;
+  margin-left: 18px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 10px 10px 40px;
+  /* Adjust padding for the icon */
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  outline: none;
+}
+
+.search-input::placeholder {
+  color: #b7b5b5;
+  /* Match the color of the icon */
+}
+
+.search-icon {
+  position: absolute;
+  left: 18px;
+  /* Adjust icon position */
+  color: #b7b5b5;
+  font-size: 20px;
 }

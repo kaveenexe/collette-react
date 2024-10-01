@@ -1,48 +1,44 @@
+// NavBar.js
 import React from "react";
+import { FaBell } from "react-icons/fa"; // Import bell icon for notifications
+import SearchBar from "./SearchBar";
+import "./Dashboard.css"; // Create this CSS file for styling
 
-const Navigation = () => {
+const NavBar = ({ onSearch, user }) => {
   return (
-    <div style={{ margin: "20px", display: "flex", justifyContent: "center" }}>
-      <nav class="navbar navbar-expand-lg navbar-light ">
-       
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-toggle="collapse"
-          data-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav">
-            <li class="nav-item active">
-              <a class="nav-link" href="#">
-                Home <span class="sr-only">(current)</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                Features
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                Pricing
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link disabled" href="#">
-                Disabled
-              </a>
-            </li>
-          </ul>
+    <div className="navbar">
+      <div className="searchbar">
+        <SearchBar onSearch={onSearch} />
+      </div>
+      <div className="navbar-items">
+        {/* Language Icon */}
+        <img
+          src="https://flagcdn.com/w320/gb.png"
+          alt="Language"
+          className="navbar-icon"
+        />
+
+        {/* Notification Button */}
+        <div className="notification-icon">
+          <FaBell />
+          <span className="notification-badge">2</span>{" "}
+          {/* Example notification count */}
         </div>
-      </nav>
+
+        {/* Profile Picture */}
+        <div className="profile-picture">
+          <img
+            src={
+              user?.profilePicture ||
+              "https://png.pngtree.com/png-clipart/20240314/original/pngtree-avatar-with-flat-style-png-image_14587877.png"
+            }
+            alt="Profile"
+            className="navbar-profile-img"
+          />
+        </div>
+      </div>
     </div>
   );
 };
 
-export default Navigation;
+export default NavBar;
