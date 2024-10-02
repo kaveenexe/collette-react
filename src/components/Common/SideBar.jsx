@@ -14,7 +14,6 @@ import { MdOutlineWarehouse, MdOutlineDashboard } from "react-icons/md";
 import { PiDress } from "react-icons/pi";
 import { PiUsersThree } from "react-icons/pi";
 import { BsDiagram3 } from "react-icons/bs";
-import { FaUsers } from "react-icons/fa";
 import { Menu } from "antd";
 import { AuthContext } from "../../context/AuthContext";
 
@@ -43,7 +42,8 @@ const SideBar = () => {
       key: "products",
       icon: <PiDress className="fs-4" />,
       label: "Products",
-      visible: user && (user.role === "Administrator" || user.role === "Vendor"),
+      visible:
+        user && (user.role === "Administrator" || user.role === "Vendor"),
     },
     {
       key: "categories",
@@ -55,7 +55,11 @@ const SideBar = () => {
       key: "orders",
       icon: <AiOutlineShoppingCart className="fs-4" />,
       label: "Orders",
-      visible: user && (user.role === "Administrator" || user.role === "Vendor" || user.role === "CSR"),
+      visible:
+        user &&
+        (user.role === "Administrator" ||
+          user.role === "Vendor" ||
+          user.role === "CSR"),
       subItems: [
         {
           key: "create-order",
@@ -70,7 +74,8 @@ const SideBar = () => {
         {
           key: "cancel-orders",
           label: "Cancel Orders",
-          visible: user && (user.role === "Administrator" || user.role === "CSR"),
+          visible:
+            user && (user.role === "Administrator" || user.role === "CSR"),
         },
       ],
     },
@@ -100,7 +105,7 @@ const SideBar = () => {
     },
     {
       key: "customer-management",
-      icon: <FaUsers className="fs-4" />,
+      icon: <PiUsersThree className="fs-4" />,
       label: "Customer Management",
       visible: user && (user.role === "Administrator" || user.role === "CSR"),
     },
