@@ -9,6 +9,7 @@ import OrderList from "./pages/Admin/Order/Orders";
 import CreateOrder from "./pages/Admin/Order/CreateOrder";
 import CancelOrders from "./pages/Admin/Order/CancelOrders";
 import UpdateOrder from "./pages/Admin/Order/UpdateOrder";
+import ViewOrder from "./pages/Admin/Order/ViewOrder";
 import Inventory from "./pages/Admin/Inventory/Inventory";
 import Categories from "./pages/Admin/Categories";
 import Vendors from "./pages/Admin/UserManagement/Vendor/Vendors";
@@ -16,7 +17,6 @@ import Customers from "./pages/Admin/UserManagement/Customer/Cusomers";
 import Products from "./pages/Admin/Products";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Unauthorized from "./pages/Unauthorized/page";
-import Orders from "./pages/Admin/Order/Orders";
 import Createproduct from "./components/product/Createproduct";
 
 function App() {
@@ -27,14 +27,13 @@ function App() {
         {/* Public route */}
         <Route path="/login" element={<Login />} />
         <Route
-        
-            path="/createproduct"
-            element={
-              <ProtectedRoute allowedRoles={["Vendor","Administrator"]}>
-                <Createproduct />
-                </ProtectedRoute>
-            }
-          />
+          path="/createproduct"
+          element={
+            <ProtectedRoute allowedRoles={["Vendor", "Administrator"]}>
+              <Createproduct />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Root route */}
         <Route
@@ -98,7 +97,7 @@ function App() {
           <Route
             path="orders"
             element={
-              <ProtectedRoute allowedRoles={["Vendor", "Administrator"]}>
+              <ProtectedRoute allowedRoles={["Vendor", "Administrator", "CSR"]}>
                 <OrderList />
               </ProtectedRoute>
             }
@@ -106,15 +105,15 @@ function App() {
           <Route
             path="create-order"
             element={
-              <ProtectedRoute allowedRoles={["Vendor", "Administrator"]}>
+              <ProtectedRoute allowedRoles={["CSR", "Administrator"]}>
                 <CreateOrder />
               </ProtectedRoute>
             }
           />
           <Route
-            path="update-order"
+            path="update-order/:id"
             element={
-              <ProtectedRoute allowedRoles={["Vendor", "Administrator"]}>
+              <ProtectedRoute allowedRoles={["Vendor", "Administrator", "CSR"]}>
                 <UpdateOrder />
               </ProtectedRoute>
             }
@@ -122,14 +121,21 @@ function App() {
           <Route
             path="cancel-orders"
             element={
-              <ProtectedRoute allowedRoles={["Vendor", "Administrator"]}>
+              <ProtectedRoute allowedRoles={["CSR", "Administrator"]}>
                 <CancelOrders />
               </ProtectedRoute>
             }
           />
-         
+          <Route
+            path="view-order/:id"
+            element={
+              <ProtectedRoute allowedRoles={["CSR", "Administrator"]}>
+                <ViewOrder />
+              </ProtectedRoute>
+            }
+          />
         </Route>
-          
+
         {/* Unauthorized route */}
         <Route path="/unauthorized" element={<Unauthorized />} />
       </Routes>

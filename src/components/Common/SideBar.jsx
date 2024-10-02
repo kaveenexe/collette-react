@@ -55,22 +55,22 @@ const SideBar = () => {
       key: "orders",
       icon: <AiOutlineShoppingCart className="fs-4" />,
       label: "Orders",
-      visible: user && (user.role === "Administrator" || user.role === "Vendor"),
+      visible: user && (user.role === "Administrator" || user.role === "Vendor" || user.role === "CSR"),
       subItems: [
         {
           key: "create-order",
           label: "New Order",
-          visible: user && (user.role === "Administrator" || user.role === "Vendor"),
+          visible: user && user.role === "Administrator",
         },
-        {
-          key: "update-order",
-          label: "Update Orders",
-          visible: user && (user.role === "Administrator" || user.role === "Vendor"),
-        },
+        // {
+        //   key: "update-order",
+        //   label: "Update Orders",
+        //   visible: user && user.role === "Administrator",
+        // },
         {
           key: "cancel-orders",
           label: "Cancel Orders",
-          visible: user && (user.role === "Administrator" || user.role === "Vendor"),
+          visible: user && (user.role === "Administrator" || user.role === "CSR"),
         },
       ],
     },
