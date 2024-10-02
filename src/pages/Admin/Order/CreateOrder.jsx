@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -6,34 +6,62 @@ import Alert from "react-bootstrap/Alert";
 import Header from "../../../components/Common/Header";
 import visaImage from "../../../images/visa.png";
 import mastercardImage from "../../../images/master.png";
-import codImage from "../../../images/cod.png"; 
+import codImage from "../../../images/cod.png";
 import { FaSearch, FaPlus, FaMinus, FaTrash } from "react-icons/fa";
 import "./OrderStyles.css";
 
 const CreateOrder = () => {
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
-  const [ errorMessage, setErrorMessage ] = useState( "" );
-  const [ selectedPaymentMethod, setSelectedPaymentMethod ] = useState( "" );
-  const [ searchQuery, setSearchQuery ] = useState( "" );
-  const [orderItems, setOrderItems] = useState([
-    {
-      id: 1,
-      productName: "Emilia One Shoulder White Printed Dress",
-      quantity: 1,
-      price: 5500,
-      imageUrl:
-        "https://nilsonline.lk/image/cache/catalog/nils/product/046007371/1%20(67)-612x875.jpg",
-    },
-    {
-      id: 2,
-      productName: "Pleated Green Strappy Dress",
-      quantity: 2,
-      price: 3900,
-      imageUrl:
-        "https://nilsonline.lk/image/cache/catalog/nils/product/046007272/14-612x875.jpg",
-    },
-  ]);
-  
+  const [errorMessage, setErrorMessage] = useState("");
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [orderItems, setOrderItems] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+
+  // Fetch products from API
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_BASE_URL}/api/products`
+      );
+      const data = await response.json();
+      setProducts(data); // Store products in state
+      setFilteredProducts(data); // Initially show all products
+    } catch (error) {
+      setErrorMessage("Error fetching products");
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts(); // Fetch products on component mount
+  }, []);
+
+  // Handle search query change and filter products
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+    const filtered = products.filter((product) =>
+      product.productName.toLowerCase().includes(e.target.value.toLowerCase())
+    );
+    setFilteredProducts(filtered);
+  };
+
+  // Handle adding product to order
+  const handleAddProduct = (product) => {
+    setOrderItems((prevItems) => {
+      const existingItem = prevItems.find((item) => item.id === product.id);
+      if (existingItem) {
+        return prevItems.map((item) =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
+      } else {
+        return [...prevItems, { ...product, quantity: 1 }];
+      }
+    });
+  };
+
   const handleQuantityChange = (id, change) => {
     setOrderItems((prevItems) =>
       prevItems.map((item) =>
@@ -44,6 +72,10 @@ const CreateOrder = () => {
     );
   };
 
+  const handleRemoveItem = (id) => {
+    setOrderItems((prevItems) => prevItems.filter((item) => item.id !== id));
+  };
+
   const calculateTotal = () => {
     return orderItems.reduce(
       (total, item) => total + item.price * item.quantity,
@@ -51,21 +83,17 @@ const CreateOrder = () => {
     );
   };
 
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
-  };
-
-  const handlePaymentMethodChange = (method) => {
-    setSelectedPaymentMethod(method);
-  };
-
+  // Form input state
   const [formInputs, setFormInputs] = useState({
     name: "",
     email: "",
     phone: "",
-    busNumber: "",
-    assignedRoute: "",
-    noOfShifts: "",
+    del_ins: "",
+    address: "",
+    city: "",
+    province: "",
+    pcode: "",
+    country: "Sri Lanka", // Assuming the country is always Sri Lanka
   });
 
   const handleInputChange = (e) => {
@@ -76,43 +104,59 @@ const CreateOrder = () => {
     }));
   };
 
+  const handlePaymentMethodChange = (method) => {
+    setSelectedPaymentMethod(method);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const orderDto = {
+      CreatedByAdmin: true,
+      BillingDetails: {
+        CustomerName: formInputs.name,
+        Email: formInputs.email,
+        Phone: formInputs.phone,
+        BillingAddress: {
+          StreetAddress: formInputs.address,
+          City: formInputs.city,
+          Province: formInputs.province,
+          PostalCode: formInputs.pcode,
+          Country: formInputs.country,
+        },
+      },
+      OrderItemsGroups: [
+        {
+          ListItemId: 1,
+          Items: orderItems.map((item) => ({
+            ProductId: item.id,
+            Quantity: item.quantity,
+          })),
+        },
+      ],
+    };
+
     try {
       const response = await fetch(
-        "http://localhost:5000/inspectors/add-inspector",
+        `${process.env.REACT_APP_API_BASE_URL}/api/orders/Admin`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(formInputs),
+          body: JSON.stringify(orderDto),
         }
       );
 
-      const responseData = await response.json();
-
       if (!response.ok) {
-        throw new Error(
-          responseData.error ||
-            "An error occurred while assigning the inspector."
-        );
+        throw new Error("Failed to create order");
       }
 
+      const result = await response.json();
       setShowSuccessAlert(true);
-      setFormInputs({
-        name: "",
-        email: "",
-        phone: "",
-        busNumber: "",
-        assignedRoute: "",
-        noOfShifts: "",
-      });
+      setErrorMessage("");
+      console.log(result);
     } catch (error) {
-      console.error("Error:", error);
-      setErrorMessage(
-        error.message || "An error occurred while assigning the inspector."
-      );
+      setErrorMessage(error.message);
       setShowSuccessAlert(false);
     }
   };
@@ -419,16 +463,13 @@ const CreateOrder = () => {
                 <tr key={item.id}>
                   <td className="product-name-column">
                     <div className="product-details">
-                      <img
+                      {/* <img
                         src={item.imageUrl}
                         alt={item.productName}
                         className="product-image"
-                      />
+                      /> */}
                       <div className="product-info">
                         <span className="product-name">{item.productName}</span>
-                        <span className="product-details-text">
-                          {item.productDetails}
-                        </span>
                       </div>
                     </div>
                   </td>

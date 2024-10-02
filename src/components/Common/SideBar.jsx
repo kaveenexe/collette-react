@@ -51,25 +51,29 @@ const SideBar = () => {
         label: "Categories",
       },
     user &&
-      (user.role === "Administrator" || user.role === "Vendor") && {
+      (user.role === "Administrator" ||
+        user.role === "Vendor" ||
+        user.role === "CSR") && {
         key: "orders", // Unique key for Orders menu
         icon: <AiOutlineShoppingCart className="fs-4" />,
         label: "Orders",
         subItems: [
-          // Only 'Administrator' and 'Vendor' can create orders
-          (user.role === "Administrator" || user.role === "Vendor") && {
+          // Only 'Administrator' can create orders
+          user.role === "Administrator" && {
             key: "create-order",
             label: "New Order",
           },
-          // Only 'Administrator' and 'Vendor' can update orders
-          (user.role === "Administrator" || user.role === "Vendor") && {
-            key: "update-order",
-            label: "Update Orders",
-          },
-          // Both 'Administrator' and 'Vendor' can cancel orders
-          (user.role === "Administrator" || user.role === "Vendor") && {
+          // // Only 'Administrator' and 'CSR' can update orders
+          // (user.role === "Administrator" ||
+          //   user.role === "Vendor" ||
+          //   user.role === "CSR") && {
+          //   key: "update-order",
+          //   label: "Update Orders",
+          // },
+          // Both 'Administrator' and 'CSR' can cancel orders
+          (user.role === "Administrator" || user.role === "CSR") && {
             key: "cancel-orders",
-            label: "Cancel Orders",
+            label: "Cancel Requests",
           },
         ].filter(Boolean), // Filter out any false/null values to ensure no invalid entries
       },

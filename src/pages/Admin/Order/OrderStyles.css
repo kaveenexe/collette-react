@@ -24,8 +24,8 @@
   font-size: 17px;
   max-width: 400px;
   position: fixed;
-  top: 10px;
-  right: 10px;
+  top: 95px;
+  right: 25px;
   z-index: 9999;
 }
 
@@ -451,12 +451,13 @@ tfoot .create-order-button {
 
 .table th.customer-column,
 .table td.customer-column {
-  width: 22%;
+  width: 20%;
 }
 
 .table th.date-column,
 .table td.date-column {
-  width: 13%;
+  width: 15%;
+  text-align: center;
 }
 
 /* Set widths for each column */
@@ -469,7 +470,7 @@ tfoot .create-order-button {
 
 .table th.payment-method-column,
 .table td.payment-method-column {
-  width: 15%;
+  width: 14%;
   /* Width for Payment Method column */
   text-align: center;
 }
@@ -509,13 +510,23 @@ tfoot .create-order-button {
 }
 
 .status-badge.delivered {
-  background-color: #f8f5bf;
-  color: #ffb300c2;
+  background-color: #f1eda2;
+  color: #8d6300;
 }
 
 .status-badge.cancelled {
   background-color: #f8c1c1;
   color: #ff0000;
+}
+
+.status-badge.partiallydelivered {
+  background-color: #ffe2a6;
+  color: #ff8c00;
+}
+
+.status-badge.pending {
+  background-color: #d0e0ff;
+  color: #0056b3;
 }
 
 .action-btn {
@@ -673,7 +684,7 @@ tfoot .create-order-button {
   font-weight: bold;
   font-size: 18px;
   background-color: #f1f1f1;
-  text-align: right;
+  text-align: center;
   color: #333;
   padding: 10px;
 }

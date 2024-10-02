@@ -6,37 +6,11 @@ import Alert from "react-bootstrap/Alert";
 import Header from "../../../components/Common/Header";
 import "./OrderStyles.css";
 
-const UpdateOrder = () => {
+const ViewOrder = () => {
   const { id } = useParams();
-  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  const getStatusClass = () => {
-    return order ? getStatusClassByStatus(order.status) : ""; // Modify to check order's current status
-  };
-
-  const getStatusClassByStatus = (status) => {
-    switch (status) {
-      case "Purchased":
-        return "purchased";
-      case "Accepted":
-        return "accepted";
-      case "Processing":
-        return "processing";
-      case "Delivered":
-        return "delivered";
-      case "Cancelled":
-        return "cancelled";
-      case "PartiallyDelivered":
-        return "partiallydelivered";
-      case "Pending":
-        return "pending";
-      default:
-        return "";
-    }
-  };
 
   useEffect(() => {
     // Fetch order data by ID
@@ -82,12 +56,12 @@ const UpdateOrder = () => {
 
   const statusMapping = {
     0: "Purchased",
+    6: "Pending",
     1: "Accepted",
     2: "Processing",
-    3: "Delivered",
     4: "PartiallyDelivered",
+    3: "Delivered",
     5: "Cancelled",
-    6: "Pending",
   };
 
   const paymentMethodMapping = {
@@ -109,100 +83,13 @@ const UpdateOrder = () => {
     return new Intl.DateTimeFormat("en-US", options).format(date);
   };
 
-  // Handle status change and update order state
-  const handleStatusChange = (e) => {
-    const newStatusString = e.target.value;
-    const statusMapping = {
-      Purchased: 0,
-      Accepted: 1,
-      Processing: 2,
-      Delivered: 3,
-      Cancelled: 5,
-      PartiallyDelivered: 4,
-      Pending: 6,
-    };
-    const newStatus = statusMapping[newStatusString]; // Convert to number
-    setOrder((prevOrder) => ({
-      ...prevOrder,
-      status: newStatus, // Update the order's status in the state
-    }));
-  };
-
-  // Function to update the order status on the server
-  const updateOrder = async () => {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_BASE_URL}/api/Orders/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ status: order.status }), // Send updated status
-        }
-      );
-      if (response.ok) {
-        setShowSuccessAlert(true); // Show success alert
-      } else {
-        setErrorMessage("Failed to update order status.");
-      }
-    } catch (error) {
-      setErrorMessage("Error updating order status.");
-    }
-  };
-
   return (
     <div className="main-component">
       <Header
-        title="Update Order"
-        subtitle="Make Order Status Change to Existing Orders"
+        title="View Order"
+        subtitle="Detailed Overview of Customer Orders"
       />
-
-      {showSuccessAlert && (
-        <Alert
-          variant="success"
-          onClose={() => setShowSuccessAlert(false)}
-          dismissible
-          className="success-alert"
-        >
-          Order Status Updated Successfully!
-        </Alert>
-      )}
-
-      {errorMessage && (
-        <Alert
-          variant="danger"
-          onClose={() => setErrorMessage("")}
-          dismissible
-          className="error-alert"
-        >
-          {errorMessage}
-        </Alert>
-      )}
       <br />
-
-      <div className="order-table-header">
-        <div className="status-container">
-          <strong>Change Order Status </strong>
-          <select
-            value={order.status} // Bind the select to order.status
-            onChange={handleStatusChange} // Update the status on change
-            className={`order-status-filter-2 ${getStatusClass()}`}
-          >
-            <option value="Purchased">Purchased</option>
-            <option value="Pending">Pending</option>
-            <option value="Accepted">Accepted</option>
-            <option value="Processing">Processing</option>
-            <option value="PartiallyDelivered">PartiallyDelivered</option>
-            <option value="Delivered">Delivered</option>
-            <option value="Cancelled">Cancelled</option>
-          </select>
-        </div>
-
-        <button className="add-update-order-btn" onClick={updateOrder}>
-          Update Order
-        </button>
-      </div>
 
       <Row>
         <Col md={5}>
@@ -321,4 +208,4 @@ const UpdateOrder = () => {
   );
 };
 
-export default UpdateOrder;
+export default ViewOrder;

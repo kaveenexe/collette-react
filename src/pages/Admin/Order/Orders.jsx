@@ -1,68 +1,149 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import Alert from "react-bootstrap/Alert";
 import Header from "../../../components/Common/Header";
 import "./OrderStyles.css";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaPen, FaTrash } from "react-icons/fa"; // Importing the FontAwesome icons
 
 const Orders = () => {
+  const [orders, setOrders] = useState([]);
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState(""); // State for search input
+  const [selectedStatus, setSelectedStatus] = useState(""); // State for selected status
   const navigate = useNavigate(); // Create a navigate function
 
   const handleAddOrderClick = () => {
     navigate("/dashboard/create-order"); // Navigate to the create order page
   };
 
-  const orders = [
-    {
-      id: "#CD2302",
-      customer: "Kamal Perera",
-      email: "kamal.perera@gmail.com",
-      date: "August 15 2024",
-      time: "2:20pm",
-      total: "LKR5300", // Example total in LKR
-      payment: "Mastercard",
-      status: "Accepted",
-    },
-    {
-      id: "#CD2305",
-      customer: "Dilani Fernando",
-      email: "dilani.fernando@gmail.com",
-      date: "August 04 2024",
-      time: "3:10pm",
-      total: "LKR2760", // Example total in LKR
-      payment: "Visa",
-      status: "Processing",
-    },
-    {
-      id: "#CD2310",
-      customer: "Nirosha Silva",
-      email: "nirosha.silva@gmail.com",
-      date: "August 02 2024",
-      time: "3:40pm",
-      total: "LKR14000", // Example total in LKR
-      payment: "Credit Card",
-      status: "Delivered",
-    },
-    {
-      id: "#CD2322",
-      customer: "Ramesh Kumara",
-      email: "ramesh.kumara@gmail.com",
-      date: "June 25 2024",
-      time: "4:10pm",
-      total: "LKR3800", // Example total in LKR
-      payment: "Transfer",
-      status: "Purchased",
-    },
-    {
-      id: "#CD2311",
-      customer: "Anjali Wijesekara",
-      email: "anjali.wijesekara@gmail.com",
-      date: "May 18 2024",
-      time: "4:30pm",
-      total: "LKR4560", // Example total in LKR
-      payment: "COD", // Updated payment method
-      status: "Cancelled",
-    },
-  ];
+  // Fetch all orders from the backend
+  const fetchAllOrders = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_BASE_URL}/api/orders`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch orders");
+      }
+
+      const data = await response.json();
+      setOrders(data);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  // Use useEffect to fetch data when the component mounts
+  useEffect(() => {
+    fetchAllOrders();
+  }, []);
+
+  const statusMapping = {
+    0: "Purchased",
+    1: "Accepted",
+    2: "Processing",
+    3: "Delivered",
+    4: "PartiallyDelivered",
+    5: "Cancelled",
+    6: "Pending",
+  };
+
+  const paymentMethodMapping = {
+    0: "Visa",
+    1: "Master",
+    2: "COD",
+  };
+
+  const formatDate = (dateString) => {
+    const optionsDate = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    };
+    const optionsTime = {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+    };
+    const date = new Date(dateString);
+    const formattedDate = date.toLocaleString("en-US", optionsDate);
+    const formattedTime = date
+      .toLocaleString("en-US", optionsTime)
+      .replace(",", "");
+
+    return `${formattedDate}<br>${formattedTime}`;
+  };
+
+  // Function to handle order deletion
+  const handleDeleteOrder = async (id) => {
+    if (window.confirm("Are you sure you want to delete this order?")) {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_BASE_URL}/api/orders/${id}`,
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to delete the order");
+        }
+
+        setOrders(orders.filter((order) => order.id !== id));
+        setShowSuccessAlert(true);
+      } catch (err) {
+        setError(err.message);
+      }
+    }
+  };
+
+  // Function to handle search input change
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  // Function to handle status selection change
+  const handleStatusChange = (e) => {
+    setSelectedStatus(e.target.value); // Update selected status
+  };
+
+  // Filter orders based on search query and selected status
+  const filteredOrders = orders.filter((order) => {
+    const orderIdMatches = order.orderId
+      .toString()
+      .includes(searchQuery.toLowerCase());
+    const customerNameMatches = order.billingDetails.customerName
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+
+    // Check if the order's status matches the selected status (if any)
+    const statusMatches = selectedStatus
+      ? statusMapping[order.status] === selectedStatus
+      : true; // If no status is selected, include all orders
+
+    return (orderIdMatches || customerNameMatches) && statusMatches; // Show orders that match either criteria
+  });
+
+  // Function to handle editing order
+  const handleEditOrder = (id) => {
+    navigate(`/dashboard/update-order/${id}`);
+  };
+
+  // Function to handle viewing order
+  const handleViewOrder = (id) => {
+    navigate(`/dashboard/view-order/${id}`);
+  };
 
   return (
     <div className="main-component">
@@ -70,20 +151,51 @@ const Orders = () => {
         title="Order Management"
         subtitle="Keep Track of Recent Orders: Stay Informed on Status and Updates"
       />
+      {showSuccessAlert && (
+        <Alert
+          variant="success"
+          onClose={() => setShowSuccessAlert(false)}
+          dismissible
+          className="success-alert"
+        >
+          Order deleted successfully!
+        </Alert>
+      )}
+      {error && (
+        <Alert
+          variant="danger"
+          onClose={() => setError(null)}
+          dismissible
+          className="error-alert"
+        >
+          {error}
+        </Alert>
+      )}
 
       <div className="order-table">
         <div className="order-table-header">
-          <input type="text" placeholder="Search..." className="order-search" />
+          <input
+            type="text"
+            placeholder="Search..."
+            className="order-search"
+            value={searchQuery}
+            onChange={handleSearchChange} // Handle search input change
+          />
 
           <div className="status-container">
             <span>Status</span>
-            <select className="order-status-filter">
-              <option>Choose...</option>
-              <option>Purchased</option>
-              <option>Accepted</option>
-              <option>Processing</option>
-              <option>Delivered</option>
-              <option>Cancelled</option>
+            <select
+              className="order-status-filter"
+              onChange={handleStatusChange}
+            >
+              <option value="">Choose...</option>
+              <option value="Purchased">Purchased</option>
+              <option value="Pending">Pending</option>
+              <option value="Accepted">Accepted</option>
+              <option value="Processing">Processing</option>
+              <option value="PartiallyDelivered">PartiallyDelivered</option>
+              <option value="Delivered">Delivered</option>
+              <option value="Cancelled">Cancelled</option>
             </select>
           </div>
 
@@ -95,49 +207,63 @@ const Orders = () => {
         <table className="table">
           <thead>
             <tr>
-              <th class="orderid-column">Order ID</th>
-              <th class="customer-column">Customer</th>
-              <th class="date-column">Date</th>
-              <th class="total-column">Total</th>
-              <th class="payment-method-column">Payment Method</th>
-              <th class="order-status-column">Order Status</th>
-              <th class="action-column">Action</th>
+              <th className="orderid-column">Order ID</th>
+              <th className="customer-column">Customer</th>
+              <th className="date-column">Date</th>
+              <th className="total-column">Total</th>
+              <th className="payment-method-column">Payment Method</th>
+              <th className="order-status-column">Order Status</th>
+              <th className="action-column">Action</th>
             </tr>
           </thead>
           <tbody>
-            {orders.map((order) => (
+            {filteredOrders.map((order) => (
               <tr key={order.id}>
-                <td class="orderid-column">{order.id}</td>
-                <td class="customer-column">
+                <td className="orderid-column">{order.orderId}</td>
+                <td className="customer-column">
                   <div>
-                    <strong>{order.customer}</strong>
+                    <strong>{order.billingDetails.customerName}</strong>
                     <br />
-                    <small>{order.email}</small>
+                    <small>{order.billingDetails.email}</small>
                   </div>
                 </td>
-                <td class="date-column">
-                  {order.date}
-                  <br />
-                  <small>{order.time}</small>
+                <td
+                  className="date-column"
+                  dangerouslySetInnerHTML={{
+                    __html: formatDate(order.orderDate),
+                  }}
+                ></td>
+                <td className="total-column">LKR{order.totalAmount}</td>
+                <td className="payment-method-column">
+                  {paymentMethodMapping[order.paymentMethod]}
                 </td>
-                <td class="total-column">{order.total}</td>
-                <td class="payment-method-column">{order.payment}</td>
-                <td class="order-status-column">
+                <td className="order-status-column">
                   <span
-                    className={`status-badge ${order.status.toLowerCase()}`}
+                    className={`status-badge ${statusMapping[
+                      order.status
+                    ].toLowerCase()}`}
                   >
-                    {order.status}
+                    {statusMapping[order.status]}
                   </span>
                 </td>
-                <td class="action-column">
-                  <button className="action-btn view-btn">
-                    <FaEye /> {/* View icon */}
+                <td className="action-column">
+                  <button
+                    className="action-btn view-btn"
+                    onClick={() => handleViewOrder(order.id)}
+                  >
+                    <FaEye />
                   </button>
-                  <button className="action-btn edit-btn">
-                    <FaPen /> {/* Edit icon */}
+                  <button
+                    className="action-btn edit-btn"
+                    onClick={() => handleEditOrder(order.id)}
+                  >
+                    <FaPen />
                   </button>
-                  <button className="action-btn delete-btn">
-                    <FaTrash /> {/* Delete icon */}
+                  <button
+                    className="action-btn delete-btn"
+                    onClick={() => handleDeleteOrder(order.id)}
+                  >
+                    <FaTrash />
                   </button>
                 </td>
               </tr>
