@@ -21,14 +21,21 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Unauthorized from "./pages/Unauthorized/page";
 import Createproduct from "./components/product/Createproduct";
 import Notfound from "./pages/Unauthorized/Notfound";
+import LoadingSpinner from "./components/Spinner/LoadingSpinner";
 
 function App() {
   const { user } = useContext(AuthContext);
+
   return (
     <div>
       <Routes>
         {/* Public route */}
-        <Route path="/" element={<Homepage />} />
+        <Route
+          path="/"
+          element={
+            user ? <Navigate to="/dashboard" /> : <Homepage />
+          }
+        />
         <Route path="/login" element={<Login />} />
         <Route
           path="/createproduct"
@@ -36,14 +43,6 @@ function App() {
             <ProtectedRoute allowedRoles={["Vendor", "Administrator"]}>
               <Createproduct />
             </ProtectedRoute>
-          }
-        />
-
-        {/* Root route */}
-        <Route
-          path="/"
-          element={
-            user ? <Navigate to="/dashboard" /> : <Navigate to="/" />
           }
         />
 
@@ -57,7 +56,6 @@ function App() {
           }
         >
           {/* Nested routes under the dashboard layout */}
-
           <Route
             path="users"
             element={
