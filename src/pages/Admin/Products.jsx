@@ -24,21 +24,33 @@ const ProductList = () => {
   const { user } = useContext(AuthContext);
   const vendorId = user.userId;
 
+  
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const data = await Apiservice.getAllProducts(vendorId);
-        setProducts(data);
-        setFilteredProducts(data);
-        setLoading(false);
+        if (user.role === 'Vendor') {
+          // If the user is a vendor, fetch vendor-specific products
+          const data = await Apiservice.getAllProducts(vendorId);
+          setProducts(data);
+          setFilteredProducts(data);
+        } else if (user.role === 'Administrator') {
+          // If the user is an admin, fetch all products
+          const data = await Apiservice.getProducts();
+          setProducts(data);
+          setFilteredProducts(data);
+        }
       } catch (err) {
         setError('Failed to fetch products');
+      } finally {
         setLoading(false);
       }
     };
-
+  
     fetchProducts();
-  }, [vendorId]);
+  }, [vendorId, user.role]); // Adding user.role as a dependency
+  
+  
+  
 
   useEffect(() => {
     const results = products.filter(product =>
