@@ -10,7 +10,7 @@ const NotFound = () => {
         <h1 className="display-1 fw-bold animate-glitch">404</h1>
         <h2 className="mb-4 animate-fade-in">Oops! This Page Not Found</h2>
         <p className="lead animate-fade-in">
-          Looks like this clothing item has gone missing from our virtual wardrobe.
+          Looks like this path is not valid
         </p>
       </div>
       <Shirt className="clothing-icon shirt" size={48} />
