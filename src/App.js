@@ -13,6 +13,7 @@ import ViewOrder from "./pages/Admin/Order/ViewOrder";
 import Inventory from "./pages/Admin/Inventory/Inventory";
 import Categories from "./pages/Admin/Categories";
 import Vendors from "./pages/Admin/UserManagement/Vendor/Vendors";
+import CSR from "./pages/Admin/UserManagement/CSR/CSR";
 import Customers from "./pages/CSR/Customer/Cusomers";
 import Products from "./pages/Admin/Products";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -75,6 +76,14 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["Administrator"]}>
                 <Vendors />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="csr-management"
+            element={
+              <ProtectedRoute allowedRoles={["Administrator"]}>
+                <CSR />
               </ProtectedRoute>
             }
           />

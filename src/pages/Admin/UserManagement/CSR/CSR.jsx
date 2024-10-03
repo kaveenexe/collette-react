@@ -2,15 +2,14 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Header from "../../../../components/Common/Header";
 import { FaPen, FaTrash } from "react-icons/fa";
-import "./Vendors.css"; // Import the custom stylesheet
+import "./CSR.css"; // Import the custom stylesheet
 
-const Vendors = () => {
-  const [vendors, setVendors] = useState([]); // State to store vendor data
+const CSRManagement = () => {
+  const [csrs, setCSRs] = useState([]); // State to store CSR data
   const [showModal, setShowModal] = useState(false); // State to manage modal visibility
-  const [editingVendor, setEditingVendor] = useState(null); // State to determine if editing or adding
-  const [validationErrors, setValidationErrors] = useState({});
+  const [editingCSR, setEditingCSR] = useState(null); // State to determine if editing or adding
 
-  // Vendor fields
+  // CSR fields
   const [nic, setNic] = useState("");
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -23,34 +22,37 @@ const Vendors = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
-  // Fetch all vendors from the backend when the component loads
+  // Validation errors
+  const [validationErrors, setValidationErrors] = useState({});
+
+  // Fetch all CSRs from the backend when the component loads
   useEffect(() => {
-    const fetchVendors = async () => {
+    const fetchCSRs = async () => {
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_API_BASE_URL}/api/users/vendors`
+          `${process.env.REACT_APP_API_BASE_URL}/api/users/csrs`
         );
-        setVendors(response.data); // Set the fetched vendors in state
+        setCSRs(response.data); // Set the fetched CSRs in state
       } catch (error) {
-        console.error("Error fetching vendors:", error);
+        console.error("Error fetching CSRs:", error);
       }
     };
 
-    fetchVendors();
+    fetchCSRs();
   }, []);
 
-  // Open modal for adding or editing a vendor
-  const openModal = (vendor = null) => {
-    setEditingVendor(vendor);
-    if (vendor) {
-      setNic(vendor.nic);
-      setEmail(vendor.email);
-      setFirstName(vendor.firstName);
-      setLastName(vendor.lastName);
-      setUsername(vendor.username);
-      setAddress(vendor.address);
-      setContactNumber(vendor.contactNumber);
-      setStatus(vendor.isActive ? "active" : "inactive");
+  // Open modal for adding or editing a CSR
+  const openModal = (csr = null) => {
+    setEditingCSR(csr);
+    if (csr) {
+      setNic(csr.nic);
+      setEmail(csr.email);
+      setFirstName(csr.firstName);
+      setLastName(csr.lastName);
+      setUsername(csr.username);
+      setAddress(csr.address);
+      setContactNumber(csr.contactNumber);
+      setStatus(csr.isActive ? "active" : "inactive");
       setPassword(""); // Set password to empty for editing
     } else {
       resetForm();
@@ -86,7 +88,7 @@ const Vendors = () => {
     else if (contactNumber.length !== 10)
       errors.contactNumber = "Contact number must be exactly 10 digits.";
     
-    if (!password && !editingVendor) errors.password = "Password is required.";
+    if (!password && !editingCSR) errors.password = "Password is required.";
     if (password && password.length < 6) errors.password = "Password must be at least 6 characters long.";
 
     // Email format validation
@@ -101,13 +103,14 @@ const Vendors = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validateForm()) return; // If form validation fails, return
+    // Validate the form
+    if (!validateForm()) return;
 
     try {
-      if (editingVendor) {
-        // Update existing vendor (PUT request)
+      if (editingCSR) {
+        // Update existing CSR (PUT request)
         const response = await axios.put(
-          `${process.env.REACT_APP_API_BASE_URL}/api/users/${editingVendor.id}`,
+          `${process.env.REACT_APP_API_BASE_URL}/api/users/${editingCSR.id}`,
           {
             firstName,
             lastName,
@@ -117,9 +120,9 @@ const Vendors = () => {
             isActive: status === "active" ? true : false,
           }
         );
-        setSuccessMessage("Vendor updated successfully!");
+        setSuccessMessage("CSR updated successfully!");
       } else {
-        // Add new vendor (POST request)
+        // Add new CSR (POST request)
         const response = await axios.post(
           `${process.env.REACT_APP_API_BASE_URL}/api/auth/register`,
           {
@@ -129,51 +132,51 @@ const Vendors = () => {
             lastName,
             username,
             password,
-            userType: "Vendor", // Setting the user type to "Vendor"
+            userType: "CSR", // Setting the user type to "CSR"
             address,
             contactNumber,
             isActive: status === "active" ? true : false,
           }
         );
-        setSuccessMessage("Vendor registered successfully!");
+        setSuccessMessage("CSR registered successfully!");
       }
 
-      // Refetch vendors after adding/updating
-      const updatedVendors = await axios.get(
-        `${process.env.REACT_APP_API_BASE_URL}/api/users/vendors`
+      // Refetch CSRs after adding/updating
+      const updatedCSRs = await axios.get(
+        `${process.env.REACT_APP_API_BASE_URL}/api/users/csrs`
       );
-      setVendors(updatedVendors.data); // Update the vendors list
+      setCSRs(updatedCSRs.data); // Update the CSRs list
 
       setShowModal(false); // Close the modal after submission
       resetForm(); // Reset form fields
     } catch (error) {
-      setErrorMessage("Error saving vendor. Please try again.");
-      console.error("Error saving vendor:", error);
+      setErrorMessage("Error saving CSR. Please try again.");
+      console.error("Error saving CSR:", error);
     }
   };
 
   return (
     <div className="main-component">
       <Header
-        title="Vendor Management"
-        subtitle="Foster vendor relationships by managing accounts effectively."
+        title="CSR Management"
+        subtitle="Manage CSR accounts effectively."
       />
       <br />
 
       <div className="container mt-4">
         <div className="row">
           <div className="d-flex justify-content-between">
-            <h5>Vendor List</h5>
-            {/* Button to open modal for adding new vendor */}
+            <h5>CSR List</h5>
+            {/* Button to open modal for adding new CSR */}
             <button className="btn btn-danger mr-5" onClick={() => openModal()}>
-              Add Vendor
+              Add CSR
             </button>
           </div>
           <div className="col-md-12">
             <table className="table table-bordered mt-3">
               <thead className="table-dark">
                 <tr>
-                  <th>Vendor Name</th>
+                  <th>CSR Name</th>
                   <th>Email</th>
                   <th>NIC</th>
                   <th>Address</th>
@@ -183,29 +186,29 @@ const Vendors = () => {
                 </tr>
               </thead>
               <tbody>
-                {vendors.length > 0 ? (
-                  vendors.map((vendor) => (
-                    <tr key={vendor.id}>
+                {csrs.length > 0 ? (
+                  csrs.map((csr) => (
+                    <tr key={csr.id}>
                       <td>
-                        {vendor.firstName} {vendor.lastName}
+                        {csr.firstName} {csr.lastName}
                       </td>
-                      <td>{vendor.email}</td>
-                      <td>{vendor.nic}</td>
-                      <td>{vendor.address}</td>
-                      <td>{vendor.contactNumber}</td>
+                      <td>{csr.email}</td>
+                      <td>{csr.nic}</td>
+                      <td>{csr.address}</td>
+                      <td>{csr.contactNumber}</td>
                       <td>
                         <span
                           className={`badge ${
-                            vendor.isActive ? "bg-success" : "bg-danger"
+                            csr.isActive ? "bg-success" : "bg-danger"
                           }`}
                         >
-                          {vendor.isActive ? "Active" : "Inactive"}
+                          {csr.isActive ? "Active" : "Inactive"}
                         </span>
                       </td>
                       <td>
                         <button
                           className="btn btn-sm"
-                          onClick={() => openModal(vendor)}
+                          onClick={() => openModal(csr)}
                         >
                           <FaPen />
                         </button>
@@ -218,7 +221,7 @@ const Vendors = () => {
                 ) : (
                   <tr>
                     <td colSpan="7" className="text-center">
-                      No vendors found
+                      No CSRs found
                     </td>
                   </tr>
                 )}
@@ -228,14 +231,14 @@ const Vendors = () => {
         </div>
       </div>
 
-      {/* Modal for adding/updating vendors */}
+      {/* Modal for adding/updating CSRs */}
       {showModal && (
         <div className="modal fade show" style={{ display: "block" }}>
           <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">
-                  {editingVendor ? "Edit Vendor" : "Add New Vendor"}
+                  {editingCSR ? "Edit CSR" : "Add New CSR"}
                 </h5>
                 <button
                   type="button"
@@ -261,7 +264,7 @@ const Vendors = () => {
                       className="form-control"
                       value={nic}
                       onChange={(e) => setNic(e.target.value)}
-                      disabled={!!editingVendor} // Disable NIC when editing
+                      disabled={!!editingCSR} // Disable NIC when editing
                       required
                     />
                     {validationErrors.nic && (
@@ -280,7 +283,7 @@ const Vendors = () => {
                       className="form-control"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      disabled={!!editingVendor} // Disable Email when editing
+                      disabled={!!editingCSR} // Disable Email when editing
                       required
                     />
                     {validationErrors.email && (
@@ -343,7 +346,7 @@ const Vendors = () => {
                       </small>
                     )}
                   </div>
-                  {!editingVendor && (
+                  {!editingCSR && (
                     <div className="mb-3">
                       <label htmlFor="password" className="form-label">
                         Password
@@ -354,7 +357,7 @@ const Vendors = () => {
                         className="form-control"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        required={!editingVendor}
+                        required={!editingCSR}
                       />
                       {validationErrors.password && (
                         <small className="text-danger">
@@ -414,7 +417,7 @@ const Vendors = () => {
                     </select>
                   </div>
                   <button type="submit" className="btn btn-primary btn-block">
-                    {editingVendor ? "Update Vendor" : "Add Vendor"}
+                    {editingCSR ? "Update CSR" : "Add CSR"}
                   </button>
                 </form>
               </div>
@@ -429,4 +432,4 @@ const Vendors = () => {
   );
 };
 
-export default Vendors;
+export default CSRManagement;
