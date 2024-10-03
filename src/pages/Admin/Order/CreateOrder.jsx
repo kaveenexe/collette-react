@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from "react";
+import { useNavigate } from "react-router-dom";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -9,23 +10,29 @@ import mastercardImage from "../../../images/master.png";
 import codImage from "../../../images/cod.png";
 import { FaSearch, FaPlus, FaMinus, FaTrash } from "react-icons/fa";
 import "./OrderStyles.css";
+import ReactPaginate from "react-paginate";
 
-const CreateOrder = () => {
+const CreateOrder = () =>
+{
+  const navigate = useNavigate();
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
   const [orderItems, setOrderItems] = useState([]);
   const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [ filteredProducts, setFilteredProducts ] = useState( [] );
+  const [currentPage, setCurrentPage] = useState(0);
+  const productsPerPage = 5;
 
   // Fetch products from API
   const fetchProducts = async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_BASE_URL}/api/products`
+        `${process.env.REACT_APP_API_BASE_URL}/api/customer/products`
       );
       const data = await response.json();
+      console.log(data);
       setProducts(data); // Store products in state
       setFilteredProducts(data); // Initially show all products
     } catch (error) {
@@ -39,12 +46,28 @@ const CreateOrder = () => {
 
   // Handle search query change and filter products
   const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
-    const filtered = products.filter((product) =>
-      product.productName.toLowerCase().includes(e.target.value.toLowerCase())
-    );
-    setFilteredProducts(filtered);
+    const query = e.target.value.toLowerCase();
+    setSearchQuery(query);
+
+    const filtered = products.filter((product) => {
+      const nameMatch = product.name.toLowerCase().includes(query);
+      const categoryMatch = product.category.toLowerCase().includes(query);
+      return nameMatch || categoryMatch;
+    });
+
+    setFilteredProducts( filtered );
+    setCurrentPage(0);
   };
+
+  const handlePageClick = ({ selected }) => {
+    setCurrentPage(selected);
+  };
+
+  const startIndex = currentPage * productsPerPage;
+  const selectedProducts = filteredProducts.slice(
+    startIndex,
+    startIndex + productsPerPage
+  );
 
   // Handle adding product to order
   const handleAddProduct = (product) => {
@@ -57,7 +80,14 @@ const CreateOrder = () => {
             : item
         );
       } else {
-        return [...prevItems, { ...product, quantity: 1 }];
+        return [
+          ...prevItems,
+          {
+            ...product,
+            quantity: 1,
+            productStatus: 0,
+          },
+        ];
       }
     });
   };
@@ -85,15 +115,17 @@ const CreateOrder = () => {
 
   // Form input state
   const [formInputs, setFormInputs] = useState({
-    name: "",
+    paymentMethod: selectedPaymentMethod,
+    customerName: "",
     email: "",
     phone: "",
     del_ins: "",
-    address: "",
+    streetAddress: "",
     city: "",
     province: "",
-    pcode: "",
-    country: "Sri Lanka", // Assuming the country is always Sri Lanka
+    postalCode: "",
+    country: "Sri Lanka",
+    singleBillingAddress: "",
   });
 
   const handleInputChange = (e) => {
@@ -106,34 +138,56 @@ const CreateOrder = () => {
 
   const handlePaymentMethodChange = (method) => {
     setSelectedPaymentMethod(method);
+    setFormInputs((prev) => ({
+      ...prev,
+      paymentMethod: method, 
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const paymentMethodMap = {
+      Visa: 0,
+      Master: 1,
+      COD: 2,
+    };
+
     const orderDto = {
-      CreatedByAdmin: true,
-      BillingDetails: {
-        CustomerName: formInputs.name,
-        Email: formInputs.email,
-        Phone: formInputs.phone,
-        BillingAddress: {
-          StreetAddress: formInputs.address,
-          City: formInputs.city,
-          Province: formInputs.province,
-          PostalCode: formInputs.pcode,
-          Country: formInputs.country,
-        },
-      },
-      OrderItemsGroups: [
+      orderItemsGroups: [
         {
-          ListItemId: 1,
-          Items: orderItems.map((item) => ({
-            ProductId: item.id,
-            Quantity: item.quantity,
+          listItemId: 0,
+          items: orderItems.map((item) => ({
+            productId: item.uniqueProductId,
+            productName: item.name,
+            vendorId: item.vendorId,
+            quantity: item.quantity,
+            price: item.price,
+            productStatus: item.productStatus || 0,
           })),
         },
       ],
+      paymentMethod: paymentMethodMap[selectedPaymentMethod],
+      customerId: "",
+      createdByCustomer: false,
+      createdByAdmin: true,
+      billingDetails: {
+        customerName: formInputs.customerName,
+        email: formInputs.email,
+        phone: formInputs.phone,
+        singleBillingAddress: formInputs.singleBillingAddress || "",
+        billingAddress: {
+          streetAddress: formInputs.streetAddress,
+          city: formInputs.city,
+          province: formInputs.province,
+          postalCode: formInputs.postalCode,
+          country: formInputs.country,
+        },
+      },
     };
+
+    // Logging for debugging
+    console.log("Order DTO:", JSON.stringify(orderDto, null, 2));
 
     try {
       const response = await fetch(
@@ -147,14 +201,26 @@ const CreateOrder = () => {
         }
       );
 
+      // Log the response to see the raw text
+      const responseText = await response.text();
+      console.log("Raw response:", responseText); // Add this line
+
       if (!response.ok) {
-        throw new Error("Failed to create order");
+        let errorMessage = response.statusText;
+        try {
+          const errorData = JSON.parse(responseText); // Try parsing the response text
+          errorMessage = errorData.message || errorMessage;
+        } catch (e) {
+          console.error("Error parsing response:", e);
+        }
+        throw new Error(`Failed to create order: ${errorMessage}`);
       }
 
-      const result = await response.json();
+      const result = JSON.parse(responseText); // Parse the response text
       setShowSuccessAlert(true);
       setErrorMessage("");
       console.log(result);
+      navigate("/dashboard/orders");
     } catch (error) {
       setErrorMessage(error.message);
       setShowSuccessAlert(false);
@@ -202,8 +268,8 @@ const CreateOrder = () => {
                     <Form.Label>Name</Form.Label>
                     <Form.Control
                       type="text"
-                      name="name"
-                      value={formInputs.name}
+                      name="customerName"
+                      value={formInputs.customerName}
                       onChange={handleInputChange}
                       placeholder="Ex: John Doe"
                     />
@@ -258,8 +324,8 @@ const CreateOrder = () => {
                       <Form.Label>Street Address</Form.Label>
                       <Form.Control
                         type="text"
-                        name="address"
-                        value={formInputs.address}
+                        name="streetAddress"
+                        value={formInputs.streetAddress}
                         onChange={handleInputChange}
                         placeholder="Enter your street address"
                       />
@@ -281,7 +347,6 @@ const CreateOrder = () => {
                             <option value="Mannar">Mannar</option>
                             <option value="Mullaitivu">Mullaitivu</option>
                             <option value="Vavuniya">Vavuniya</option>
-                            <option value="Jaffna">Jaffna</option>
                             <option value="Puttalam">Puttalam</option>
                             <option value="Kurunegala">Kurunegala</option>
                             <option value="Gampaha">Gampaha</option>
@@ -338,8 +403,8 @@ const CreateOrder = () => {
                           <Form.Label>Postal Code</Form.Label>
                           <Form.Control
                             type="text"
-                            name="pcode"
-                            value={formInputs.pcode}
+                            name="postalCode"
+                            value={formInputs.postalCode}
                             onChange={handleInputChange}
                             placeholder="Enter your postal code"
                           />
@@ -389,12 +454,12 @@ const CreateOrder = () => {
                         {/* MasterCard Option */}
                         <div
                           className={`payment-card ${
-                            selectedPaymentMethod === "MasterCard"
+                            selectedPaymentMethod === "Master"
                               ? "selected"
                               : ""
                           }`}
                           onClick={() =>
-                            handlePaymentMethodChange("MasterCard")
+                            handlePaymentMethodChange("Master")
                           }
                         >
                           <img
@@ -445,31 +510,88 @@ const CreateOrder = () => {
               onChange={handleSearchChange}
             />
           </div>
-          <button className="search-button">Search</button>
+          <button className="add-button">Search</button>
         </div>
+
+        {/* Search Results */}
+        <div className="products">
+          {selectedProducts.length > 0 ? (
+            <table className="order-items-table">
+              <thead>
+                <tr>
+                  <th className="category-column">Category</th>
+                  <th className="product-name-column">Product</th>
+                  <th className="stock-column">Stock</th>
+                  <th className="price-column">Price</th>
+                  <th className="add-column"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {selectedProducts.map((product) => (
+                  <tr key={product.id}>
+                    <td className="category-column">{product.category}</td>
+                    <td className="product-name-column">{product.name}</td>
+                    <td className="stock-column">
+                      {product.stockQuantity > 10 ? (
+                        <span className="badge in-stock">In Stock</span>
+                      ) : (
+                        <span className="badge low-stock">
+                          Low Stock: {product.stockQuantity}
+                        </span>
+                      )}
+                    </td>
+                    <td className="price-column">LKR {product.price}</td>
+                    <td className="add-column">
+                      <button
+                        className="add-button"
+                        onClick={() => handleAddProduct(product)}
+                      >
+                        Add
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p>No products found. Please adjust your search.</p>
+          )}
+        </div>
+
+        <ReactPaginate
+          previousLabel={"Previous"}
+          nextLabel={"Next"}
+          breakLabel={"..."}
+          pageCount={Math.ceil(filteredProducts.length / productsPerPage)}
+          marginPagesDisplayed={2}
+          pageRangeDisplayed={3}
+          onPageChange={handlePageClick}
+          containerClassName={"pagination"}
+          activeClassName={"active"}
+        />
+
         <div className="products">
           <table className="order-items-table">
             <thead>
               <tr>
-                <th className="product-name-column">Product</th>
+                <th className="product-id-column">Product ID</th>{" "}
+                <th className="product-name-column">Product Name</th>
                 <th className="quantity-column">Quantity</th>
                 <th className="price-column">Price</th>
                 <th className="remove-column"></th>{" "}
-                {/* Empty header for the remove button */}
               </tr>
             </thead>
             <tbody>
               {orderItems.map((item) => (
                 <tr key={item.id}>
+                  <td className="product-id-column">
+                    <span className="product-id">{item.uniqueProductId}</span>{" "}
+                  </td>
                   <td className="product-name-column">
                     <div className="product-details">
-                      {/* <img
-                        src={item.imageUrl}
-                        alt={item.productName}
-                        className="product-image"
-                      /> */}
+                      {/* <img src={item.imageUrl} alt={item.productName} className="product-image" /> */}
                       <div className="product-info">
-                        <span className="product-name">{item.productName}</span>
+                        <span className="product-name">{item.name}</span>
                       </div>
                     </div>
                   </td>
@@ -494,7 +616,7 @@ const CreateOrder = () => {
                   <td className="remove-column">
                     <button
                       className="remove-button"
-                      // onClick={() => handleRemoveItem(item.id)}
+                      onClick={() => handleRemoveItem(item.id)}
                     >
                       <FaTrash />
                     </button>
@@ -504,7 +626,7 @@ const CreateOrder = () => {
             </tbody>
             <tfoot className="footer-styles">
               <tr>
-                <td colSpan="2">Total Price</td>
+                <td colSpan="3">Total Price</td>
                 <td className="total-price">
                   LKR {calculateTotal().toFixed(2)}
                 </td>

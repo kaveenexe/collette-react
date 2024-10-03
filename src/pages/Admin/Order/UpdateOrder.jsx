@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from "react";
+import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -6,12 +7,16 @@ import Alert from "react-bootstrap/Alert";
 import Header from "../../../components/Common/Header";
 import "./OrderStyles.css";
 
-const UpdateOrder = () => {
+const UpdateOrder = () =>
+{
+  const navigate = useNavigate();
   const { id } = useParams();
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [userRole, setUserRole] = useState(""); // User role
+  const [userId, setUserId] = useState(""); // Vendor ID for vendor users
 
   const getStatusClass = () => {
     return order ? getStatusClassByStatus(order.status) : ""; // Modify to check order's current status
@@ -39,12 +44,31 @@ const UpdateOrder = () => {
   };
 
   useEffect(() => {
-    // Fetch order data by ID
+    // Fetch and parse the user data from local storage
+    const userData = JSON.parse(localStorage.getItem("user"));
+
+    if (userData) {
+      setUserRole(userData.role);
+      setUserId(userData.userId);
+    }
+
     const fetchOrder = async () => {
       try {
-        const response = await fetch(
-          `${process.env.REACT_APP_API_BASE_URL}/api/Orders/${id}`
-        );
+        let response;
+
+        // Check if the user is a vendor and adjust the API route accordingly
+        if (userData.role === "Vendor") {
+          // Fetch vendor-specific order details using vendorId
+          response = await fetch(
+            `${process.env.REACT_APP_API_BASE_URL}/api/Orders/vendor/${id}/${userData.userId}`
+          );
+        } else {
+          // Fetch general order details for Admin/CSR roles
+          response = await fetch(
+            `${process.env.REACT_APP_API_BASE_URL}/api/Orders/${id}`
+          );
+        }
+
         if (response.ok) {
           const data = await response.json();
           setOrder(data);
@@ -131,20 +155,44 @@ const UpdateOrder = () => {
   // Function to update the order status on the server
   const updateOrder = async () => {
     try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_BASE_URL}/api/Orders/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ status: order.status }), // Send updated status
-        }
-      );
-      if (response.ok) {
-        setShowSuccessAlert(true); // Show success alert
+      let response;
+
+      // Check if user is a vendor and the new status is "Delivered"
+      if (userRole === "Vendor" && order.status === 3) {
+        // Use vendor-specific API to mark as delivered
+        response = await fetch(
+          `${process.env.REACT_APP_API_BASE_URL}/api/Orders/${id}/vendors/${userId}/mark-delivered`, // Updated endpoint
+          {
+            method: "PUT", // Changed to PUT
+            headers: {
+              "Content-Type": "application/json",
+            },
+            // Optionally include a request body if needed
+            body: JSON.stringify({
+              /* Add any additional data here if needed */
+            }),
+          }
+        );
       } else {
-        setErrorMessage("Failed to update order status.");
+        // General order update (non-vendor or non-delivered status)
+        response = await fetch(
+          `${process.env.REACT_APP_API_BASE_URL}/api/Orders/${id}`, // General update endpoint
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ status: order.status }), // Send updated status
+          }
+        );
+      }
+
+      if (response.ok) {
+        setShowSuccessAlert( true ); // Show success alert
+        navigate("/dashboard/orders");
+      } else {
+        const errorData = await response.json(); // Get error message from response
+        setErrorMessage(errorData.message || "Failed to update order status."); // Use error message from the server if available
       }
     } catch (error) {
       setErrorMessage("Error updating order status.");

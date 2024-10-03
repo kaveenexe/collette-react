@@ -11,14 +11,35 @@ const ViewOrder = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [userRole, setUserRole] = useState(""); // User role
+  const [userId, setUserId] = useState(""); // Vendor ID for vendor users
 
   useEffect(() => {
-    // Fetch order data by ID
+    // Fetch and parse the user data from local storage
+    const userData = JSON.parse(localStorage.getItem("user"));
+
+    if (userData) {
+      setUserRole(userData.role);
+      setUserId(userData.userId);
+    }
+
     const fetchOrder = async () => {
       try {
-        const response = await fetch(
-          `${process.env.REACT_APP_API_BASE_URL}/api/Orders/${id}`
-        );
+        let response;
+
+        // Check if the user is a vendor and adjust the API route accordingly
+        if (userData.role === "Vendor") {
+          // Fetch vendor-specific order details using vendorId
+          response = await fetch(
+            `${process.env.REACT_APP_API_BASE_URL}/api/Orders/vendor/${id}/${userData.userId}`
+          );
+        } else {
+          // Fetch general order details for Admin/CSR roles
+          response = await fetch(
+            `${process.env.REACT_APP_API_BASE_URL}/api/Orders/${id}`
+          );
+        }
+
         if (response.ok) {
           const data = await response.json();
           setOrder(data);
