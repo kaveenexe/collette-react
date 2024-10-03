@@ -105,7 +105,7 @@ function App() {
           <Route
             path="create-order"
             element={
-              <ProtectedRoute allowedRoles={["CSR", "Administrator"]}>
+              <ProtectedRoute allowedRoles={["Administrator"]}>
                 <CreateOrder />
               </ProtectedRoute>
             }
@@ -129,7 +129,7 @@ function App() {
           <Route
             path="view-order/:id"
             element={
-              <ProtectedRoute allowedRoles={["CSR", "Administrator"]}>
+              <ProtectedRoute allowedRoles={["CSR", "Administrator", "Vendor"]}>
                 <ViewOrder />
               </ProtectedRoute>
             }

@@ -11,31 +11,59 @@ const Orders = () => {
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState(""); // State for search input
   const [selectedStatus, setSelectedStatus] = useState(""); // State for selected status
+  const [userRole, setUserRole] = useState(""); // User role
+  const [userId, setUserId] = useState(""); // Vendor ID for vendor users
   const navigate = useNavigate(); // Create a navigate function
 
   const handleAddOrderClick = () => {
     navigate("/dashboard/create-order"); // Navigate to the create order page
   };
 
-  // Fetch all orders from the backend
+  // Fetch orders from the backend
   const fetchAllOrders = async () => {
     try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_BASE_URL}/api/orders`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
+      let response;
+
+      // Fetch and parse the user data from local storage
+      const userData = JSON.parse(localStorage.getItem("user"));
+
+      if (userData && userData.role) {
+        setUserRole(userData.role);
+        setUserId(userData.userId);
+
+        if (userData.role === "Vendor" && userData.userId) {
+          // Fetch vendor-specific orders
+          response = await fetch(
+            `${process.env.REACT_APP_API_BASE_URL}/api/orders/vendor/${userData.userId}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+        } else {
+          // Fetch all orders for Admin and CSR
+          response = await fetch(
+            `${process.env.REACT_APP_API_BASE_URL}/api/orders`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
         }
-      );
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch orders");
+        if (!response.ok) {
+          throw new Error("Failed to fetch orders");
+        }
+
+        const data = await response.json();
+        setOrders(data);
+      } else {
+        console.error("No user data found in local storage");
       }
-
-      const data = await response.json();
-      setOrders(data);
     } catch (err) {
       setError(err.message);
     }
@@ -43,7 +71,7 @@ const Orders = () => {
 
   // Use useEffect to fetch data when the component mounts
   useEffect(() => {
-    fetchAllOrders();
+    fetchAllOrders(); // Fetch orders based on role
   }, []);
 
   const statusMapping = {
