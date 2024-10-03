@@ -13,7 +13,7 @@ import ViewOrder from "./pages/Admin/Order/ViewOrder";
 import Inventory from "./pages/Admin/Inventory/Inventory";
 import Categories from "./pages/Admin/Categories";
 import Vendors from "./pages/Admin/UserManagement/Vendor/Vendors";
-import Customers from "./pages/Admin/UserManagement/Customer/Cusomers";
+import Customers from "./pages/CSR/Customer/Cusomers";
 import Products from "./pages/Admin/Products";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Unauthorized from "./pages/Unauthorized/page";

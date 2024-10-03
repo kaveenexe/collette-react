@@ -1,10 +1,41 @@
-// NavBar.js
-import React from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { FaBell } from "react-icons/fa"; // Import bell icon for notifications
+import axios from "axios";
 import SearchBar from "./SearchBar";
+import { AuthContext } from "../../context/AuthContext";
+import NotificationDropdown from "./NotificationDropdown"; // Import NotificationDropdown component
 import "./Dashboard.css"; // Create this CSS file for styling
 
-const NavBar = ({ onSearch, user }) => {
+const NavBar = ({ onSearch }) => {
+  const { user } = useContext(AuthContext); // Get logged-in user details
+  const [notifications, setNotifications] = useState([]); // Store notifications
+  const [showDropdown, setShowDropdown] = useState(false); // Toggle dropdown visibility
+  const [errorMessage, setErrorMessage] = useState("");
+
+  // Fetch notifications for CSR
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        if (user?.role === "CSR") {
+          const response = await axios.get(
+            `${process.env.REACT_APP_API_BASE_URL}/api/notifications/csr`
+          );
+          setNotifications(response.data); // Store fetched notifications
+        }
+      } catch (error) {
+        console.error("Error fetching notifications:", error);
+        setErrorMessage("Error fetching notifications.");
+      }
+    };
+
+    fetchNotifications();
+  }, [user]);
+
+  // Toggle the notification dropdown
+  const handleNotificationClick = () => {
+    setShowDropdown(!showDropdown); // Toggle visibility of the dropdown
+  };
+
   return (
     <div className="navbar">
       <div className="searchbar">
@@ -19,11 +50,19 @@ const NavBar = ({ onSearch, user }) => {
         />
 
         {/* Notification Button */}
-        <div className="notification-icon">
-          <FaBell />
-          <span className="notification-badge">2</span>{" "}
-          {/* Example notification count */}
-        </div>
+        {/* 
+            ==== Mama methanata CSR ta witharak penna dala thiyenne role eken. Oyalata anik unta pennannath onenm
+            anik roles tikath add karaganna ====
+        */}
+        {user?.role === "CSR" && (
+          <div className="notification-icon" onClick={handleNotificationClick}>
+            <FaBell />
+            <span className="notification-badge">
+              {notifications.length}
+            </span>{" "}
+            {/* Dynamic notification count */}
+          </div>
+        )}
 
         {/* Profile Picture */}
         <div className="profile-picture">
@@ -37,6 +76,20 @@ const NavBar = ({ onSearch, user }) => {
           />
         </div>
       </div>
+
+      {/* Notification Dropdown */}
+      {showDropdown && (
+        <NotificationDropdown
+          notifications={notifications}
+          onClose={() => setShowDropdown(false)}
+        />
+      )}
+
+      {errorMessage && (
+        <div className="alert alert-danger notification-error">
+          {errorMessage}
+        </div>
+      )}
     </div>
   );
 };
