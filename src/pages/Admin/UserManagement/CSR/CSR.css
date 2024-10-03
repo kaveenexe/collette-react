@@ -1,0 +1,44 @@
+.main-component {
+    padding: 20px;
+  }
+  
+  h5 {
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .table {
+    margin-top: 15px;
+  }
+  
+  .table thead th {
+    background-color: #343a40;
+    color: white;
+  }
+  
+  .btn-warning, .btn-danger {
+    margin-right: 5px;
+  }
+  
+  .form-label {
+    font-weight: bold;
+  }
+  
+  .form-control {
+    margin-bottom: 10px;
+  }
+  
+  .btn-primary {
+    width: 100%;
+  }
+  
+  .modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1040;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  
