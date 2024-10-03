@@ -46,6 +46,16 @@ const apiService = {
     }
   },
 
+  getProducts: async () => {
+    try {
+      const response = await axiosInstance.get(`${process.env.REACT_APP_API_BASE_URL}/api/customer/products`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      throw error;
+    }
+  },
+
   createProduct: async (vendorId, productData) => {
     try {
       console.log('Creating product for vendor:', vendorId);

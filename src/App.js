@@ -2,6 +2,7 @@ import "./App.css";
 import { useContext } from "react";
 import { AuthContext } from "./context/AuthContext";
 import { Routes, Route, Navigate } from "react-router-dom";
+import Homepage from "./pages/Home";
 import Login from "./pages/Login/login";
 import Dashboard from "./components/Common/Dashboard"; // Layout component
 import Users from "./pages/Admin/Users";
@@ -18,6 +19,7 @@ import Products from "./pages/Admin/Products";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Unauthorized from "./pages/Unauthorized/page";
 import Createproduct from "./components/product/Createproduct";
+import Notfound from "./pages/Unauthorized/Notfound";
 
 function App() {
   const { user } = useContext(AuthContext);
@@ -25,6 +27,7 @@ function App() {
     <div>
       <Routes>
         {/* Public route */}
+        <Route path="/" element={<Homepage />} />
         <Route path="/login" element={<Login />} />
         <Route
           path="/createproduct"
@@ -39,7 +42,7 @@ function App() {
         <Route
           path="/"
           element={
-            user ? <Navigate to="/dashboard" /> : <Navigate to="/login" />
+            user ? <Navigate to="/dashboard" /> : <Navigate to="/" />
           }
         />
 
@@ -138,6 +141,7 @@ function App() {
 
         {/* Unauthorized route */}
         <Route path="/unauthorized" element={<Unauthorized />} />
+        <Route path="/*" element={<Notfound />} />
       </Routes>
     </div>
   );
