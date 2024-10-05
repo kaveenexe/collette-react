@@ -12,7 +12,7 @@ const NavBar = ({ onSearch }) => {
   const [showDropdown, setShowDropdown] = useState(false); // Toggle dropdown visibility
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Fetch notifications for CSR
+  // Fetch notifications based on the user role (CSR or Admin)
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
@@ -20,7 +20,12 @@ const NavBar = ({ onSearch }) => {
           const response = await axios.get(
             `${process.env.REACT_APP_API_BASE_URL}/api/notifications/csr`
           );
-          setNotifications(response.data); // Store fetched notifications
+          setNotifications(response.data); // Store CSR notifications
+        } else if (user?.role === "Administrator") {
+          const response = await axios.get(
+            `${process.env.REACT_APP_API_BASE_URL}/api/notifications/admin`
+          );
+          setNotifications(response.data); // Store Admin notifications
         }
       } catch (error) {
         console.error("Error fetching notifications:", error);
@@ -34,6 +39,11 @@ const NavBar = ({ onSearch }) => {
   // Toggle the notification dropdown
   const handleNotificationClick = () => {
     setShowDropdown(!showDropdown); // Toggle visibility of the dropdown
+  };
+
+  // Clear all notifications locally
+  const handleClearAll = () => {
+    setNotifications([]); // Clear the notifications from the state
   };
 
   return (
@@ -50,17 +60,10 @@ const NavBar = ({ onSearch }) => {
         />
 
         {/* Notification Button */}
-        {/* 
-            ==== Mama methanata CSR ta witharak penna dala thiyenne role eken. Oyalata anik unta pennannath onenm
-            anik roles tikath add karaganna ====
-        */}
-        {user?.role === "CSR" && (
+        {(user?.role === "CSR" || user?.role === "Administrator") && (
           <div className="notification-icon" onClick={handleNotificationClick}>
             <FaBell />
-            <span className="notification-badge">
-              {notifications.length}
-            </span>{" "}
-            {/* Dynamic notification count */}
+            <span className="notification-badge">{notifications.length}</span>
           </div>
         )}
 
@@ -82,6 +85,7 @@ const NavBar = ({ onSearch }) => {
         <NotificationDropdown
           notifications={notifications}
           onClose={() => setShowDropdown(false)}
+          onClearAll={handleClearAll}
         />
       )}
 
