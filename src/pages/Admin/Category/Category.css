@@ -1,0 +1,93 @@
+.category-management-container {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px auto;
+    max-width: 1000px;
+  }
+  
+  .category-management {
+    width: 40%;
+    text-align: left;
+    padding: 20px;
+  }
+  
+  .category-management h2 {
+    margin-bottom: 20px;
+  }
+  
+  .form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .form input {
+    margin: 5px 0;
+    padding: 10px;
+    width: 100%;
+  }
+  
+  .form button {
+    padding: 10px 20px;
+    background-color: #3780ce;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  
+  .form button:hover {
+    background-color: #220bb8;
+  }
+  
+  .category-table {
+    width: 55%;
+    padding: 20px;
+  }
+  
+  .category-table table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  .category-table th,
+  .category-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+  }
+  
+  .category-table th {
+    background-color: #3780ce;
+    color: white;
+  }
+  
+  .category-table td button {
+    margin-left: 5px;
+    padding: 5px 10px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .edit-btn {
+    background-color: #2196f3;
+  }
+  
+  .edit-btn:hover {
+    background-color: #1976d2;
+  }
+  
+  .delete-btn {
+    background-color: #f44336;
+  }
+  
+  .delete-btn:hover {
+    background-color: #d32f2f;
+  }
+  
+  .category-table td button:hover {
+    opacity: 0.8;
+  }
+  

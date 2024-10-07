@@ -12,7 +12,7 @@ import CancelOrders from "./pages/Admin/Order/CancelOrders";
 import UpdateOrder from "./pages/Admin/Order/UpdateOrder";
 import ViewOrder from "./pages/Admin/Order/ViewOrder";
 import Inventory from "./pages/Admin/Inventory/Inventory";
-import Categories from "./pages/Admin/Categories";
+import Categories from "./pages/Admin/Category/Categories";
 import Vendors from "./pages/Admin/UserManagement/Vendor/Vendors";
 import CSR from "./pages/Admin/UserManagement/CSR/CSR";
 import Customers from "./pages/CSR/Customer/Cusomers";
@@ -69,6 +69,14 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["Administrator"]}>
                 <Inventory />
+              </ProtectedRoute>
+            }
+          />
+           <Route
+            path="categories"
+            element={
+              <ProtectedRoute allowedRoles={["Administrator"]}>
+                <Categories />
               </ProtectedRoute>
             }
           />
