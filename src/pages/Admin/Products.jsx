@@ -4,6 +4,7 @@ import { Form, FormControl, Dropdown, InputGroup } from 'react-bootstrap';
 import Apiservice from '../../components/product/Apiservice';
 import { AuthContext } from "../../context/AuthContext";
 
+// Define product categories
 const ProductCategory = {
   Shirts: 'Shirts',
   TShirts: 'T-Shirts',
@@ -13,6 +14,8 @@ const ProductCategory = {
 };
 
 const ProductList = () => {
+
+  // State variables
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -51,7 +54,7 @@ const ProductList = () => {
   
   
   
-
+// Filter products based on search term and category
   useEffect(() => {
     const results = products.filter(product =>
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
@@ -60,6 +63,7 @@ const ProductList = () => {
     setFilteredProducts(results);
   }, [searchTerm, selectedCategory, products]);
 
+  // Loading spinner
   if (loading) return (
     <div className="d-flex justify-content-center align-items-center" style={{height: '100vh'}}>
       <div className="spinner-border text-primary" role="status">
@@ -68,12 +72,14 @@ const ProductList = () => {
     </div>
   );
 
+  // Error message
   if (error) return (
     <div className="alert alert-danger m-3" role="alert">
       {error}
     </div>
   );
 
+  // Handle product deletion
   const handleDeleteProduct = async (productId) => {
     try {
       await Apiservice.deleteProduct(vendorId, productId);
@@ -85,6 +91,7 @@ const ProductList = () => {
     }
   };
 
+  // Handle product editing
   const handleEditProduct = (product) => {
     navigate('/createproduct', { state: { productToEdit: product } });
   };
@@ -92,12 +99,14 @@ const ProductList = () => {
   return (
     <div className="container mt-4">
       <div className="d-flex justify-content-between mb-4">
+      {/* Create New Product button */}
         <Link to="/createproduct" className="btn btn-primary">
           Create New Product
         </Link>
       </div>
       <h1 className="mb-4">Products</h1>
       
+      {/* Search and filter form */}
       <Form className="mb-4">
         <InputGroup>
           <FormControl
@@ -122,6 +131,7 @@ const ProductList = () => {
         </InputGroup>
       </Form>
 
+{/* Product details */}
       <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         {filteredProducts.map(product => (
           <div key={product.id} className="col">

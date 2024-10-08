@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import Apiservice from '../../components/product/Apiservice';
 import { AuthContext } from "../../context/AuthContext";
 
+// Define product categories
 const ProductCategory = {
   Shirts: 'Shirts',
   TShirts: 'T-Shirts',
@@ -14,6 +15,8 @@ const ProductCategory = {
 const CreateProduct = () => {
   const { user } = useContext(AuthContext);
   const vendorId = user.userId;
+
+  // Initialize product state
   const [product, setProduct] = useState({
     uniqueProductId: '',
     name: '',
@@ -31,6 +34,7 @@ const CreateProduct = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Check if we're in edit mode and set product data accordingly
   useEffect(() => {
     const productToEdit = location.state?.productToEdit;
     if (productToEdit) {
@@ -39,6 +43,8 @@ const CreateProduct = () => {
     }
   }, [location]);
 
+
+  // Form validation
   const validateForm = () => {
     let tempErrors = {};
     if (!product.uniqueProductId.trim()) tempErrors.uniqueProductId = "Unique Product ID is required";
@@ -54,6 +60,7 @@ const CreateProduct = () => {
     return Object.keys(tempErrors).length === 0;
   };
 
+  // Handle input changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setProduct(prevProduct => ({
@@ -62,6 +69,7 @@ const CreateProduct = () => {
     }));
   };
 
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
