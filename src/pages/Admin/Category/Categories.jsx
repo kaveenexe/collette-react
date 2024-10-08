@@ -1,81 +1,89 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Category.css';
 import { FaEdit, FaTrash } from 'react-icons/fa';
+import categoryService from './CategoryService';
 
 const Categories = () => {
   const [categories, setCategories] = useState([]);
-  const [selectedProduct, setSelectedProduct] = useState('');
   const [categoryName, setCategoryName] = useState('');
   const [description, setDescription] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [editingCategoryId, setEditingCategoryId] = useState(null);
 
-  const products = ['Shirts', 'T-shirts', 'Trousers', 'Shorts', 'Pants'];
 
-  // Add category function
-  const addCategory = () => {
-    if (selectedProduct && categoryName && description) {
-      setCategories([
-        ...categories,
-        {
-          id: Date.now(),
-          product: selectedProduct,
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await categoryService.getAllCategories();
+        setCategories(data);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  const addCategory = async () => {
+    if (categoryName && description) {
+      try {
+        const newCategory = await categoryService.createCategory({
           name: categoryName,
           description: description,
-        },
-      ]);
-      setSelectedProduct('');
-      setCategoryName('');
-      setDescription('');
+        });
+        setCategories([...categories, newCategory]);
+        resetForm();
+      } catch (error) {
+        console.error('Error adding category:', error);
+      }
     }
   };
 
-  // Edit category function
   const editCategory = (category) => {
-    setSelectedProduct(category.product);
     setCategoryName(category.name);
     setDescription(category.description);
     setIsEditing(true);
     setEditingCategoryId(category.id);
   };
 
-  // Update category function
-  const updateCategory = () => {
-    setCategories(
-      categories.map((category) =>
-        category.id === editingCategoryId
-          ? { ...category, product: selectedProduct, name: categoryName, description: description }
-          : category
-      )
-    );
-    setIsEditing(false);
-    setSelectedProduct('');
-    setCategoryName('');
-    setDescription('');
-    setEditingCategoryId(null);
+  const updateCategory = async () => {
+    try {
+      const updatedCategory = await categoryService.updateCategory(editingCategoryId, {
+        name: categoryName,
+        description: description,
+      });
+      setCategories(
+        categories.map((category) =>
+          category.id === editingCategoryId ? updatedCategory : category
+        )
+      );
+      resetForm();
+    } catch (error) {
+      console.error('Error updating category:', error);
+    }
   };
 
-  // Delete category function
-  const deleteCategory = (id) => {
-    setCategories(categories.filter((category) => category.id !== id));
+  const deleteCategory = async (id) => {
+    try {
+      await categoryService.deleteCategory(id);
+      setCategories(categories.filter((category) => category.id !== id));
+    } catch (error) {
+      console.error('Error deleting category:', error);
+    }
+  };
+
+  const resetForm = () => {
+    setCategoryName('');
+    setDescription('');
+    setIsEditing(false);
+    setEditingCategoryId(null);
   };
 
   return (
     <div className="category-management-container">
       <div className="category-management">
-        <h2>Category Management</h2>
+        <h2>Add New Category</h2>
         <div className="form">
-          <select
-            value={selectedProduct}
-            onChange={(e) => setSelectedProduct(e.target.value)}
-          >
-            <option value="">Select a Product</option>
-            {products.map((product) => (
-              <option key={product} value={product}>
-                {product}
-              </option>
-            ))}
-          </select>
 
           <input
             type="text"
@@ -105,7 +113,6 @@ const Categories = () => {
           <table>
             <thead>
               <tr>
-                <th>Product</th>
                 <th>Category Name</th>
                 <th>Description</th>
                 <th>Actions</th>
@@ -114,7 +121,6 @@ const Categories = () => {
             <tbody>
               {categories.map((category) => (
                 <tr key={category.id}>
-                  <td>{category.product}</td>
                   <td>{category.name}</td>
                   <td>{category.description}</td>
                   <td>
