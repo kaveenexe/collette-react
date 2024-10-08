@@ -4,38 +4,54 @@ import { FaEdit, FaTrash } from 'react-icons/fa';
 
 const Categories = () => {
   const [categories, setCategories] = useState([]);
-  const [categoryId, setCategoryId] = useState('');
+  const [selectedProduct, setSelectedProduct] = useState('');
   const [categoryName, setCategoryName] = useState('');
+  const [description, setDescription] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [editingCategoryId, setEditingCategoryId] = useState(null);
 
+  const products = ['Shirts', 'T-shirts', 'Trousers', 'Shorts', 'Pants'];
+
   // Add category function
   const addCategory = () => {
-    if (categoryId && categoryName) {
-      setCategories([...categories, { id: categoryId, name: categoryName }]);
-      setCategoryId('');
+    if (selectedProduct && categoryName && description) {
+      setCategories([
+        ...categories,
+        {
+          id: Date.now(),
+          product: selectedProduct,
+          name: categoryName,
+          description: description,
+        },
+      ]);
+      setSelectedProduct('');
       setCategoryName('');
+      setDescription('');
     }
   };
 
   // Edit category function
-  const editCategory = (id, name) => {
-    setCategoryId(id);
-    setCategoryName(name);
+  const editCategory = (category) => {
+    setSelectedProduct(category.product);
+    setCategoryName(category.name);
+    setDescription(category.description);
     setIsEditing(true);
-    setEditingCategoryId(id);
+    setEditingCategoryId(category.id);
   };
 
   // Update category function
   const updateCategory = () => {
     setCategories(
       categories.map((category) =>
-        category.id === editingCategoryId ? { id: categoryId, name: categoryName } : category
+        category.id === editingCategoryId
+          ? { ...category, product: selectedProduct, name: categoryName, description: description }
+          : category
       )
     );
     setIsEditing(false);
-    setCategoryId('');
+    setSelectedProduct('');
     setCategoryName('');
+    setDescription('');
     setEditingCategoryId(null);
   };
 
@@ -47,20 +63,34 @@ const Categories = () => {
   return (
     <div className="category-management-container">
       <div className="category-management">
-        <h2>Add Category</h2>
+        <h2>Category Management</h2>
         <div className="form">
-          <input
-            type="text"
-            placeholder="Category ID"
-            value={categoryId}
-            onChange={(e) => setCategoryId(e.target.value)}
-          />
+          <select
+            value={selectedProduct}
+            onChange={(e) => setSelectedProduct(e.target.value)}
+          >
+            <option value="">Select a Product</option>
+            {products.map((product) => (
+              <option key={product} value={product}>
+                {product}
+              </option>
+            ))}
+          </select>
+
           <input
             type="text"
             placeholder="Category Name"
             value={categoryName}
             onChange={(e) => setCategoryName(e.target.value)}
           />
+
+          <input
+            type="text"
+            placeholder="Description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+
           {isEditing ? (
             <button onClick={updateCategory}>Update Category</button>
           ) : (
@@ -70,26 +100,34 @@ const Categories = () => {
       </div>
 
       <div className="category-table">
-        <h3>Category List</h3>
+        <h2>Category List</h2>
         {categories.length > 0 ? (
           <table>
             <thead>
               <tr>
-                <th>Category ID</th>
+                <th>Product</th>
                 <th>Category Name</th>
+                <th>Description</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {categories.map((category) => (
                 <tr key={category.id}>
-                  <td>{category.id}</td>
+                  <td>{category.product}</td>
                   <td>{category.name}</td>
+                  <td>{category.description}</td>
                   <td>
-                    <button className="edit-btn" onClick={() => editCategory(category.id, category.name)}>
+                    <button
+                      className="edit-btn"
+                      onClick={() => editCategory(category)}
+                    >
                       <FaEdit /> Edit
                     </button>
-                    <button className="delete-btn" onClick={() => deleteCategory(category.id)}>
+                    <button
+                      className="delete-btn"
+                      onClick={() => deleteCategory(category.id)}
+                    >
                       <FaTrash /> Delete
                     </button>
                   </td>
