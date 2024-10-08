@@ -42,7 +42,7 @@
 
 /* Add spacing between the Add Category section and the table */
 .category-table {
-  width: 55%;
+  width: 65%;
   padding: 20px;
   margin-left: 50px; /* This adds gap between the two sections */
 }
