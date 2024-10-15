@@ -64,7 +64,19 @@ const apiService = {
     try {
       console.log('Creating product for vendor:', vendorId);
       console.log('Product data:', productData);
-      const response = await axiosInstance.post(`${process.env.REACT_APP_API_BASE_URL}/api/products?vendorId=${vendorId}`, productData);
+      
+      // Change the content type to multipart/form-data
+      const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      };
+      
+      const response = await axiosInstance.post(
+        `${process.env.REACT_APP_API_BASE_URL}/api/products?vendorId=${vendorId}`,
+        productData,
+        config
+      );
       return response.data;
     } catch (error) {
       console.error('Error creating product:', error.response?.data || error.message);
@@ -77,7 +89,19 @@ const apiService = {
     try {
       console.log('Updating product for vendor:', vendorId);
       console.log('Product data:', productData);
-      const response = await axiosInstance.put(`${process.env.REACT_APP_API_BASE_URL}/api/products/${id}?vendorId=${vendorId}`, productData);
+      
+      // Change the content type to multipart/form-data
+      const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      };
+      
+      const response = await axiosInstance.put(
+        `${process.env.REACT_APP_API_BASE_URL}/api/products/${id}?vendorId=${vendorId}`,
+        productData,
+        config
+      );
       return response.data;
     } catch (error) {
       console.error(`Error updating product with id ${id}:`, error.response?.data || error.message);
