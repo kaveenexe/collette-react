@@ -25,7 +25,8 @@ const CreateProduct = () => {
     stockQuantity: '',
     isActive: true,
     category: '',
-    vendorId: vendorId  // CHANGE: Include vendorId in initial state
+    vendorId: vendorId,
+    image: null // New field for image file
   });
 
   const [errors, setErrors] = useState({});
@@ -43,7 +44,6 @@ const CreateProduct = () => {
     }
   }, [location]);
 
-
   // Form validation
   const validateForm = () => {
     let tempErrors = {};
@@ -56,17 +56,25 @@ const CreateProduct = () => {
       tempErrors.stockQuantity = "Stock quantity must be a non-negative integer";
     }
     if (!product.category) tempErrors.category = "Category is required";
+    if (!product.image && !isEditMode) tempErrors.image = "Image is required";
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
   };
 
   // Handle input changes
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setProduct(prevProduct => ({
-      ...prevProduct,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+    const { name, value, type, checked, files } = e.target;
+    if (type === 'file') {
+      setProduct(prevProduct => ({
+        ...prevProduct,
+        [name]: files[0]
+      }));
+    } else {
+      setProduct(prevProduct => ({
+        ...prevProduct,
+        [name]: type === 'checkbox' ? checked : value
+      }));
+    }
   };
 
   // Handle form submission
@@ -75,18 +83,21 @@ const CreateProduct = () => {
     if (validateForm()) {
       setIsSubmitting(true);
       try {
-        const productToSend = {
-          ...product,
-          price: parseFloat(product.price),
-          stockQuantity: parseInt(product.stockQuantity),
-        };
+        const formData = new FormData();
+        Object.keys(product).forEach(key => {
+          if (key === 'image') {
+            if (product[key]) formData.append(key, product[key]);
+          } else {
+            formData.append(key, product[key]);
+          }
+        });
         
-        console.log('Sending product data:', productToSend); // For debugging
+        console.log('Sending product data:', formData);
   
         if (isEditMode) {
-          await Apiservice.updateProduct(vendorId, product.id, productToSend);
+          await Apiservice.updateProduct(vendorId, product.id, formData);
         } else {
-          await Apiservice.createProduct(vendorId, productToSend);
+          await Apiservice.createProduct(vendorId, formData);
         }
         
         navigate('/dashboard/products');
@@ -207,7 +218,19 @@ const CreateProduct = () => {
             onChange={handleChange}
           />
           <label className="form-check-label" htmlFor="isActive">Active</label>
+        </div> <div className="mb-3">
+          <label htmlFor="image" className="form-label">Product Image</label>
+          <input
+            type="file"
+            className={`form-control ${errors.image ? 'is-invalid' : ''}`}
+            id="image"
+            name="image"
+            onChange={handleChange}
+            accept="image/*"
+          />
+          {errors.image && <div className="invalid-feedback">{errors.image}</div>}
         </div>
+
         <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
           {isSubmitting ? (isEditMode ? 'Updating...' : 'Creating...') : (isEditMode ? 'Update Product' : 'Create Product')}
         </button>
