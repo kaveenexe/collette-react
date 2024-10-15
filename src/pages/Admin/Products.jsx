@@ -141,7 +141,7 @@ const ProductList = () => {
                 src={product.imageUrl || 'https://via.placeholder.com/300x200?text=No+Image'} 
                 className="card-img-top" 
                 alt={product.name}
-                style={{ height: '200px', objectFit: 'cover' }}
+                style={{ height: '400px', objectFit: 'cover' }}
               />
               <div className="card-body">
                 <h5 className="card-title">{product.name}</h5>
