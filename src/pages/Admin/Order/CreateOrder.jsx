@@ -589,7 +589,7 @@ const CreateOrder = () =>
                   </td>
                   <td className="product-name-column">
                     <div className="product-details">
-                      {/* <img src={item.imageUrl} alt={item.productName} className="product-image" /> */}
+                      <img src={item.imageUrl} alt={item.productName} className="product-image" />
                       <div className="product-info">
                         <span className="product-name">{item.name}</span>
                       </div>
