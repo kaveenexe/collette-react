@@ -1,26 +1,30 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import './InventoryManagement.css';
-
-// Sample data - In real implementation, you would fetch this from your API.
-const sampleInventory = [
-  { productID: '1', productName: 'Product A', stock: 12, alertLevel: 5 },
-  { productID: '2', productName: 'Product B', stock: 3, alertLevel: 5 },
-  { productID: '3', productName: 'Product C', stock: 15, alertLevel: 10 }
-];
 
 const InventoryManagement = () => {
   const [inventory, setInventory] = useState([]);
 
   useEffect(() => {
-    // Simulate an API call to fetch inventory data
-    setInventory(sampleInventory);
+    const fetchInventory = async () => {
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/inventory/products`);
+        console.log(response.data);  // Log the response to inspect the field names
+        setInventory(response.data);
+      } catch (error) {
+        console.error('Error fetching inventory data:', error);
+      }
+    };
+  
+    fetchInventory();
   }, []);
+  
 
-  const renderStockAlert = (stock, alertLevel) => {
-    if (stock <= alertLevel) {
-      return <span className="low-stock">Low Stock: {stock} units</span>;
+  const renderStockAlert = (stockQuantity, alertLevel) => {
+    if (stockQuantity <= alertLevel) {
+      return <span className="low-stock">Low Stock: {stockQuantity} units</span>;
     }
-    return <span>{stock} units</span>;
+    return <span>{stockQuantity} units</span>;
   };
 
   return (
@@ -30,6 +34,7 @@ const InventoryManagement = () => {
         <thead>
           <tr>
             <th>Product ID</th>
+            <th>Category</th>
             <th>Product Name</th>
             <th>Stock Level</th>
             <th>Action</th>
@@ -37,12 +42,13 @@ const InventoryManagement = () => {
         </thead>
         <tbody>
           {inventory.map((item) => (
-            <tr key={item.productID}>
-              <td>{item.productID}</td>
+            <tr key={item.productId}>
+              <td>{item.productId}</td>
+              <td>{item.category}</td>
               <td>{item.productName}</td>
-              <td>{renderStockAlert(item.stock, item.alertLevel)}</td>
+              <td>{renderStockAlert(item.stockQuantity, 5)}</td>
               <td>
-                <button className="remove-btn" disabled={item.stock === 0}>
+                <button className="remove-btn" disabled={item.quantity === 0}>
                   Remove Product
                 </button>
               </td>
