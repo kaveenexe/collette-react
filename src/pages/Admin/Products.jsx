@@ -3,58 +3,55 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Form, FormControl, Dropdown, InputGroup } from 'react-bootstrap';
 import Apiservice from '../../components/product/Apiservice';
 import { AuthContext } from "../../context/AuthContext";
-
-// Define product categories
-const ProductCategory = {
-  Shirts: 'Shirts',
-  TShirts: 'T-Shirts',
-  Trousers: 'Trousers',
-  Shorts: 'Shorts',
-  Pants: 'Pants',
-};
+import axios from 'axios';
 
 const ProductList = () => {
-
-  // State variables
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const [categories, setCategories] = useState([]); // New state for categories
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const navigate = useNavigate();
-
   const { user } = useContext(AuthContext);
   const vendorId = user.userId;
 
-  
+  // Fetch products
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+        let data;
         if (user.role === 'Vendor') {
-          // If the user is a vendor, fetch vendor-specific products
-          const data = await Apiservice.getAllProducts(vendorId);
-          setProducts(data);
-          setFilteredProducts(data);
+          data = await Apiservice.getAllProducts(vendorId);
         } else if (user.role === 'Administrator') {
-          // If the user is an admin, fetch all products
-          const data = await Apiservice.getProducts();
-          setProducts(data);
-          setFilteredProducts(data);
+          data = await Apiservice.getProducts();
         }
+        setProducts(data);
+        setFilteredProducts(data);
       } catch (err) {
         setError('Failed to fetch products');
       } finally {
         setLoading(false);
       }
     };
-  
     fetchProducts();
-  }, [vendorId, user.role]); // Adding user.role as a dependency
-  
-  
-  
-// Filter products based on search term and category
+  }, [vendorId, user.role]);
+
+  // Fetch categories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/Category`);
+        setCategories(response.data); // Assuming the categories come as an array
+      } catch (err) {
+        setError('Failed to fetch categories');
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  // Filter products based on search term and category
   useEffect(() => {
     const results = products.filter(product =>
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
@@ -62,22 +59,6 @@ const ProductList = () => {
     );
     setFilteredProducts(results);
   }, [searchTerm, selectedCategory, products]);
-
-  // Loading spinner
-  if (loading) return (
-    <div className="d-flex justify-content-center align-items-center" style={{height: '100vh'}}>
-      <div className="spinner-border text-primary" role="status">
-        <span className="visually-hidden">Loading...</span>
-      </div>
-    </div>
-  );
-
-  // Error message
-  if (error) return (
-    <div className="alert alert-danger m-3" role="alert">
-      {error}
-    </div>
-  );
 
   // Handle product deletion
   const handleDeleteProduct = async (productId) => {
@@ -96,16 +77,33 @@ const ProductList = () => {
     navigate('/createproduct', { state: { productToEdit: product } });
   };
 
+  // Loading spinner
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Error message
+  if (error) {
+    return (
+      <div className="alert alert-danger m-3" role="alert">
+        {error}
+      </div>
+    );
+  }
+
   return (
     <div className="container mt-4">
       <div className="d-flex justify-content-between mb-4">
-      {/* Create New Product button */}
-        <Link to="/createproduct" className="btn btn-primary">
-          Create New Product
-        </Link>
+        <Link to="/createproduct" className="btn btn-primary">Create New Product</Link>
       </div>
       <h1 className="mb-4">Products</h1>
-      
+
       {/* Search and filter form */}
       <Form className="mb-4">
         <InputGroup>
@@ -121,9 +119,9 @@ const ProductList = () => {
             </Dropdown.Toggle>
             <Dropdown.Menu>
               <Dropdown.Item onClick={() => setSelectedCategory('All')}>All</Dropdown.Item>
-              {Object.entries(ProductCategory).map(([key, value]) => (
-                <Dropdown.Item key={key} onClick={() => setSelectedCategory(key)}>
-                  {value}
+              {categories.map((category) => (
+                <Dropdown.Item key={category.id} onClick={() => setSelectedCategory(category.name)}>
+                  {category.name}
                 </Dropdown.Item>
               ))}
             </Dropdown.Menu>
@@ -131,15 +129,14 @@ const ProductList = () => {
         </InputGroup>
       </Form>
 
-{/* Product details */}
+      {/* Product details */}
       <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         {filteredProducts.map(product => (
           <div key={product.id} className="col">
             <div className="card h-100 shadow-sm">
-              {/* Add image display */}
-              <img 
-                src={product.imageUrl || 'https://via.placeholder.com/300x200?text=No+Image'} 
-                className="card-img-top" 
+              <img
+                src={product.imageUrl || 'https://via.placeholder.com/300x200?text=No+Image'}
+                className="card-img-top"
                 alt={product.name}
                 style={{ height: '400px', objectFit: 'cover' }}
               />
@@ -150,13 +147,13 @@ const ProductList = () => {
                 <div className="d-flex justify-content-between align-items-center">
                   <span className="text-muted">Rs.{product.price.toFixed(2)}</span>
                   <span className="badge bg-secondary">
-                    {ProductCategory[product.category] || product.category}
+                    {categories.find(cat => cat.id === product.category)?.name || product.category}
                   </span>
                   <button className="btn btn-secondary" onClick={() => handleEditProduct(product)}>Edit</button>
                   <button className="btn btn-danger" onClick={() => handleDeleteProduct(product.id)}>Delete</button>
                 </div>
               </div>
-              <div className="card-footer" style={{ backgroundColor: product.stockQuantity < 5 ? '#f8d7da' : '' }}> 
+              <div className="card-footer" style={{ backgroundColor: product.stockQuantity < 5 ? '#f8d7da' : '' }}>
                 <small className="text-muted">Stock: {product.stockQuantity}</small>
                 <span className={`badge float-end ${product.stockQuantity > 0 ? 'bg-success' : 'bg-danger'}`}>
                   {product.stockQuantity > 0 ? 'In Stock' : 'Out of Stock'}
