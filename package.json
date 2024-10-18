@@ -16,7 +16,7 @@
     "axios": "^1.7.7",
     "formik": "^2.4.6",
     "framer-motion": "^11.11.0",
-    "lucide-react": "^0.446.0",
+    "lucide-react": "^0.453.0",
     "metismenujs": "^1.4.0",
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.4",
