@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
@@ -12,8 +12,7 @@ import { FaSearch, FaPlus, FaMinus, FaTrash } from "react-icons/fa";
 import "./OrderStyles.css";
 import ReactPaginate from "react-paginate";
 
-const CreateOrder = () =>
-{
+const CreateOrder = () => {
   const navigate = useNavigate();
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -21,7 +20,7 @@ const CreateOrder = () =>
   const [orderItems, setOrderItems] = useState([]);
   const [products, setProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [ filteredProducts, setFilteredProducts ] = useState( [] );
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const productsPerPage = 5;
 
@@ -55,7 +54,7 @@ const CreateOrder = () =>
       return nameMatch || categoryMatch;
     });
 
-    setFilteredProducts( filtered );
+    setFilteredProducts(filtered);
     setCurrentPage(0);
   };
 
@@ -73,18 +72,27 @@ const CreateOrder = () =>
   const handleAddProduct = (product) => {
     setOrderItems((prevItems) => {
       const existingItem = prevItems.find((item) => item.id === product.id);
+      const newQuantity = existingItem ? existingItem.quantity + 1 : 1;
+
+      // Check if the new quantity exceeds the stock quantity
+      if (newQuantity > product.stockQuantity) {
+        // Optionally show an alert or notification here
+        alert(
+          `Cannot add more than ${product.stockQuantity} items of ${product.name}.`
+        );
+        return prevItems; // Return the previous items unchanged
+      }
+
       if (existingItem) {
         return prevItems.map((item) =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
+          item.id === product.id ? { ...item, quantity: newQuantity } : item
         );
       } else {
         return [
           ...prevItems,
           {
             ...product,
-            quantity: 1,
+            quantity: 1, // Set initial quantity to 1
             productStatus: 0,
           },
         ];
@@ -94,11 +102,25 @@ const CreateOrder = () =>
 
   const handleQuantityChange = (id, change) => {
     setOrderItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id
-          ? { ...item, quantity: Math.max(item.quantity + change, 1) }
-          : item
-      )
+      prevItems.map((item) => {
+        if (item.id === id) {
+          const newQuantity = item.quantity + change;
+
+          // Ensure quantity doesn't go below 1 or exceed stock quantity
+          if (newQuantity < 1) {
+            return { ...item, quantity: 1 }; // Ensure quantity doesn't go below 1
+          } else if (newQuantity > item.stockQuantity) {
+            // Optionally show an alert or notification here
+            alert(
+              `Cannot exceed the available stock of ${item.stockQuantity} for ${item.productName}.`
+            );
+            return item; // Return unchanged if exceeding stock
+          }
+
+          return { ...item, quantity: newQuantity }; // Update quantity
+        }
+        return item; // Return unchanged if not the target item
+      })
     );
   };
 
@@ -140,7 +162,7 @@ const CreateOrder = () =>
     setSelectedPaymentMethod(method);
     setFormInputs((prev) => ({
       ...prev,
-      paymentMethod: method, 
+      paymentMethod: method,
     }));
   };
 
@@ -454,13 +476,9 @@ const CreateOrder = () =>
                         {/* MasterCard Option */}
                         <div
                           className={`payment-card ${
-                            selectedPaymentMethod === "Master"
-                              ? "selected"
-                              : ""
+                            selectedPaymentMethod === "Master" ? "selected" : ""
                           }`}
-                          onClick={() =>
-                            handlePaymentMethodChange("Master")
-                          }
+                          onClick={() => handlePaymentMethodChange("Master")}
                         >
                           <img
                             src={mastercardImage}
@@ -532,7 +550,7 @@ const CreateOrder = () =>
                     <td className="category-column">{product.category}</td>
                     <td className="product-name-column">{product.name}</td>
                     <td className="stock-column">
-                      {product.stockQuantity > 10 ? (
+                      {product.stockQuantity > 5 ? (
                         <span className="badge in-stock">In Stock</span>
                       ) : (
                         <span className="badge low-stock">
@@ -545,6 +563,7 @@ const CreateOrder = () =>
                       <button
                         className="add-button"
                         onClick={() => handleAddProduct(product)}
+                        disabled={product.stockQuantity <= 0}
                       >
                         Add
                       </button>
@@ -589,7 +608,11 @@ const CreateOrder = () =>
                   </td>
                   <td className="product-name-column">
                     <div className="product-details">
-                      <img src={item.imageUrl} alt={item.productName} className="product-image" />
+                      <img
+                        src={item.imageUrl}
+                        alt={item.productName}
+                        className="product-image"
+                      />
                       <div className="product-info">
                         <span className="product-name">{item.name}</span>
                       </div>
@@ -606,6 +629,7 @@ const CreateOrder = () =>
                     <button
                       className="quantity-button"
                       onClick={() => handleQuantityChange(item.id, 1)}
+                      disabled={item.quantity >= item.stockQuantity} // Disable if max stock reached
                     >
                       <FaPlus />
                     </button>
