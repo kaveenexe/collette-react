@@ -15,6 +15,7 @@ const ProductCategory = {
 const CreateProduct = () => {
   const { user } = useContext(AuthContext);
   const vendorId = user.userId;
+  const isAdmin = user.role === 'Administrator';
 
   // Initialize product state
   const [product, setProduct] = useState({
@@ -34,6 +35,7 @@ const CreateProduct = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  
 
   // Check if we're in edit mode and set product data accordingly
   useEffect(() => {
@@ -131,6 +133,7 @@ const CreateProduct = () => {
                         name="uniqueProductId"
                         value={product.uniqueProductId}
                         onChange={handleChange}
+                        // disabled={isAdmin}
                         required
                         placeholder="Unique Product ID"
                       />

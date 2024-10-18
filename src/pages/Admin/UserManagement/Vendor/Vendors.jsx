@@ -39,6 +39,18 @@ const Vendors = () => {
     fetchVendors();
   }, []);
 
+  const deleteVendor = async (id) => {
+    try {
+      const response = await axios.delete(
+        `${process.env.REACT_APP_API_BASE_URL}/api/users/${id}`
+      );
+      setVendors(vendors.filter((vendor) => vendor.id !== id));
+      alert("Vendor deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting vendor:", error);
+    }
+  }
+
   // Open modal for adding or editing a vendor
   const openModal = (vendor = null) => {
     setEditingVendor(vendor);
@@ -57,6 +69,7 @@ const Vendors = () => {
     }
     setShowModal(true);
   };
+  
 
   // Reset form fields
   const resetForm = () => {
@@ -152,6 +165,8 @@ const Vendors = () => {
     }
   };
 
+  
+
   return (
     <div className="main-component">
       <Header
@@ -209,7 +224,10 @@ const Vendors = () => {
                         >
                           <FaPen />
                         </button>
-                        <button className="btn btn-sm">
+                        <button 
+                          className="btn btn-sm"
+                          onClick={() => deleteVendor(vendor.id)}
+                        >
                           <FaTrash />
                         </button>
                       </td>

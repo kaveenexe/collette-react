@@ -41,6 +41,18 @@ const CSRManagement = () => {
     fetchCSRs();
   }, []);
 
+  const deleteCSR = async (id) => {
+    try {
+      const response = await axios.delete(
+        `${process.env.REACT_APP_API_BASE_URL}/api/users/${id}`
+      );
+      setCSRs(csrs.filter((csr) => csr.id !== id));
+      alert("CSR deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting CSR:", error);
+    }
+  }
+
   // Open modal for adding or editing a CSR
   const openModal = (csr = null) => {
     setEditingCSR(csr);
@@ -212,7 +224,10 @@ const CSRManagement = () => {
                         >
                           <FaPen />
                         </button>
-                        <button className="btn btn-sm">
+                        <button 
+                          className="btn btn-sm"
+                          onClick={() => deleteCSR(csr.id)}
+                        >
                           <FaTrash />
                         </button>
                       </td>
