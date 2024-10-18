@@ -7,8 +7,7 @@ import Alert from "react-bootstrap/Alert";
 import Header from "../../../components/Common/Header";
 import "./OrderStyles.css";
 
-const UpdateOrder = () =>
-{
+const UpdateOrder = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
@@ -16,7 +15,9 @@ const UpdateOrder = () =>
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [userRole, setUserRole] = useState(""); // User role
-  const [userId, setUserId] = useState(""); // Vendor ID for vendor users
+  const [ userId, setUserId ] = useState( "" ); // Vendor ID for vendor users
+  const [ filteredProducts, setFilteredProducts ] = useState( [] );
+  const [products, setProducts] = useState([]);
 
   const getStatusClass = () => {
     return order ? getStatusClassByStatus(order.status) : ""; // Modify to check order's current status
@@ -42,9 +43,8 @@ const UpdateOrder = () =>
         return "";
     }
   };
-
+  
   useEffect(() => {
-    // Fetch and parse the user data from local storage
     const userData = JSON.parse(localStorage.getItem("user"));
 
     if (userData) {
@@ -52,37 +52,48 @@ const UpdateOrder = () =>
       setUserId(userData.userId);
     }
 
-    const fetchOrder = async () => {
+    const fetchOrderAndProducts = async () => {
       try {
-        let response;
+        let orderResponse;
 
-        // Check if the user is a vendor and adjust the API route accordingly
-        if (userData.role === "Vendor") {
-          // Fetch vendor-specific order details using vendorId
-          response = await fetch(
+        // Fetch order based on user role (vendor or other)
+        if (userData && userData.role === "Vendor") {
+          orderResponse = await fetch(
             `${process.env.REACT_APP_API_BASE_URL}/api/Orders/vendor/${id}/${userData.userId}`
           );
         } else {
-          // Fetch general order details for Admin/CSR roles
-          response = await fetch(
+          orderResponse = await fetch(
             `${process.env.REACT_APP_API_BASE_URL}/api/Orders/${id}`
           );
         }
 
-        if (response.ok) {
-          const data = await response.json();
-          setOrder(data);
+        if (orderResponse.ok) {
+          const orderData = await orderResponse.json();
+          setOrder(orderData);
         } else {
           setErrorMessage("Order not found.");
+          return;
+        }
+
+        // Fetch products
+        const productsResponse = await fetch(
+          `${process.env.REACT_APP_API_BASE_URL}/api/customer/products`
+        );
+        if (productsResponse.ok) {
+          const productsData = await productsResponse.json();
+          setProducts(productsData);
+          setFilteredProducts(productsData); // Initially show all products
+        } else {
+          setErrorMessage("Error fetching products");
         }
       } catch (error) {
-        setErrorMessage("Error fetching order details.");
+        setErrorMessage("Error fetching order or products.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchOrder();
+    fetchOrderAndProducts();
   }, [id]);
 
   if (loading) {
@@ -152,7 +163,6 @@ const UpdateOrder = () =>
     }));
   };
 
-  // Function to update the order status on the server
   const updateOrder = async () => {
     try {
       let response;
@@ -161,38 +171,39 @@ const UpdateOrder = () =>
       if (userRole === "Vendor" && order.status === 3) {
         // Use vendor-specific API to mark as delivered
         response = await fetch(
-          `${process.env.REACT_APP_API_BASE_URL}/api/Orders/${id}/vendors/${userId}/mark-delivered`, // Updated endpoint
-          {
-            method: "PUT", // Changed to PUT
-            headers: {
-              "Content-Type": "application/json",
-            },
-            // Optionally include a request body if needed
-            body: JSON.stringify({
-              /* Add any additional data here if needed */
-            }),
-          }
-        );
-      } else {
-        // General order update (non-vendor or non-delivered status)
-        response = await fetch(
-          `${process.env.REACT_APP_API_BASE_URL}/api/Orders/${id}`, // General update endpoint
+          `${process.env.REACT_APP_API_BASE_URL}/api/Orders/${id}/vendors/${userId}/mark-delivered`,
           {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ status: order.status }), // Send updated status
+            body: JSON.stringify({}),
+          }
+        );
+      } else {
+        // General order update
+        response = await fetch(
+          `${process.env.REACT_APP_API_BASE_URL}/api/Orders/${id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ status: order.status }),
           }
         );
       }
 
       if (response.ok) {
-        setShowSuccessAlert( true ); // Show success alert
-        navigate("/dashboard/orders");
+        setShowSuccessAlert(true); // Show success alert
+
+        // Delay navigation to give the alert time to display
+        setTimeout(() => {
+          navigate("/dashboard/orders");
+        }, 2000); // 2-second delay before navigating
       } else {
-        const errorData = await response.json(); // Get error message from response
-        setErrorMessage(errorData.message || "Failed to update order status."); // Use error message from the server if available
+        const errorData = await response.json();
+        setErrorMessage(errorData.message || "Failed to update order status.");
       }
     } catch (error) {
       setErrorMessage("Error updating order status.");
@@ -323,30 +334,40 @@ const UpdateOrder = () =>
                 </thead>
                 <tbody>
                   {order.orderItemsGroups.map((group) =>
-                    group.items.map((item) => (
-                      <tr key={item.productId}>
-                        <td className="product-name-column-new">
-                          <div className="product-details-new">
-                            {/* <img
-                              src={item.imageUrl}
-                              alt={item.productName}
-                              className="product-image-new"
-                            /> */}
-                            <div className="product-info-new">
-                              <span className="product-name-new">
-                                {item.productName}
-                              </span>
+                    group.items.map((item) => {
+                      // Find the matching product using productId and uniqueProductId
+                      const matchingProduct = products.find(
+                        (product) => product.uniqueProductId === item.productId
+                      );
+
+                      return (
+                        <tr key={item.productId}>
+                          <td className="product-name-column-new">
+                            <div className="product-details-new">
+                              <img
+                                src={
+                                  matchingProduct?.imageUrl ||
+                                  "default-image-url"
+                                }
+                                alt={item.productName}
+                                className="product-image-new"
+                              />
+                              <div className="product-info-new">
+                                <span className="product-name-new">
+                                  {item.productName}
+                                </span>
+                              </div>
                             </div>
-                          </div>
-                        </td>
-                        <td className="quantity-column-new">
-                          <span>{item.quantity}</span>
-                        </td>
-                        <td className="price-column-new">
-                          LKR {(item.price * item.quantity).toFixed(2)}
-                        </td>
-                      </tr>
-                    ))
+                          </td>
+                          <td className="quantity-column-new">
+                            <span>{item.quantity}</span>
+                          </td>
+                          <td className="price-column-new">
+                            LKR {(item.price * item.quantity).toFixed(2)}
+                          </td>
+                        </tr>
+                      );
+                    })
                   )}
                 </tbody>
                 <tfoot className="footer-styles-new">

@@ -12,10 +12,11 @@ const ViewOrder = () => {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [userRole, setUserRole] = useState(""); // User role
-  const [userId, setUserId] = useState(""); // Vendor ID for vendor users
+  const [ userId, setUserId ] = useState( "" ); // Vendor ID for vendor users
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    // Fetch and parse the user data from local storage
     const userData = JSON.parse(localStorage.getItem("user"));
 
     if (userData) {
@@ -23,37 +24,48 @@ const ViewOrder = () => {
       setUserId(userData.userId);
     }
 
-    const fetchOrder = async () => {
+    const fetchOrderAndProducts = async () => {
       try {
-        let response;
+        let orderResponse;
 
-        // Check if the user is a vendor and adjust the API route accordingly
-        if (userData.role === "Vendor") {
-          // Fetch vendor-specific order details using vendorId
-          response = await fetch(
+        // Fetch order based on user role (vendor or other)
+        if (userData && userData.role === "Vendor") {
+          orderResponse = await fetch(
             `${process.env.REACT_APP_API_BASE_URL}/api/Orders/vendor/${id}/${userData.userId}`
           );
         } else {
-          // Fetch general order details for Admin/CSR roles
-          response = await fetch(
+          orderResponse = await fetch(
             `${process.env.REACT_APP_API_BASE_URL}/api/Orders/${id}`
           );
         }
 
-        if (response.ok) {
-          const data = await response.json();
-          setOrder(data);
+        if (orderResponse.ok) {
+          const orderData = await orderResponse.json();
+          setOrder(orderData);
         } else {
           setErrorMessage("Order not found.");
+          return;
+        }
+
+        // Fetch products
+        const productsResponse = await fetch(
+          `${process.env.REACT_APP_API_BASE_URL}/api/customer/products`
+        );
+        if (productsResponse.ok) {
+          const productsData = await productsResponse.json();
+          setProducts(productsData);
+          setFilteredProducts(productsData); // Initially show all products
+        } else {
+          setErrorMessage("Error fetching products");
         }
       } catch (error) {
-        setErrorMessage("Error fetching order details.");
+        setErrorMessage("Error fetching order or products.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchOrder();
+    fetchOrderAndProducts();
   }, [id]);
 
   if (loading) {
@@ -183,30 +195,40 @@ const ViewOrder = () => {
                 </thead>
                 <tbody>
                   {order.orderItemsGroups.map((group) =>
-                    group.items.map((item) => (
-                      <tr key={item.productId}>
-                        <td className="product-name-column-new">
-                          <div className="product-details-new">
-                            {/* <img
-                              src={item.imageUrl}
-                              alt={item.productName}
-                              className="product-image-new"
-                            /> */}
-                            <div className="product-info-new">
-                              <span className="product-name-new">
-                                {item.productName}
-                              </span>
+                    group.items.map((item) => {
+                      // Find the matching product using productId and uniqueProductId
+                      const matchingProduct = products.find(
+                        (product) => product.uniqueProductId === item.productId
+                      );
+
+                      return (
+                        <tr key={item.productId}>
+                          <td className="product-name-column-new">
+                            <div className="product-details-new">
+                              <img
+                                src={
+                                  matchingProduct?.imageUrl ||
+                                  "default-image-url"
+                                }
+                                alt={item.productName}
+                                className="product-image-new"
+                              />
+                              <div className="product-info-new">
+                                <span className="product-name-new">
+                                  {item.productName}
+                                </span>
+                              </div>
                             </div>
-                          </div>
-                        </td>
-                        <td className="quantity-column-new">
-                          <span>{item.quantity}</span>
-                        </td>
-                        <td className="price-column-new">
-                          LKR {(item.price * item.quantity).toFixed(2)}
-                        </td>
-                      </tr>
-                    ))
+                          </td>
+                          <td className="quantity-column-new">
+                            <span>{item.quantity}</span>
+                          </td>
+                          <td className="price-column-new">
+                            LKR {(item.price * item.quantity).toFixed(2)}
+                          </td>
+                        </tr>
+                      );
+                    })
                   )}
                 </tbody>
                 <tfoot className="footer-styles-new">

@@ -12,20 +12,30 @@ const NavBar = ({ onSearch }) => {
   const [showDropdown, setShowDropdown] = useState(false); // Toggle dropdown visibility
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Fetch notifications based on the user role (CSR or Admin)
+  // Fetch notifications based on the user role (CSR, Admin, or Vendor)
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        if (user?.role === "CSR") {
-          const response = await axios.get(
-            `${process.env.REACT_APP_API_BASE_URL}/api/notifications/csr`
-          );
-          setNotifications(response.data); // Store CSR notifications
-        } else if (user?.role === "Administrator") {
-          const response = await axios.get(
-            `${process.env.REACT_APP_API_BASE_URL}/api/notifications/admin`
-          );
-          setNotifications(response.data); // Store Admin notifications
+        const userData = JSON.parse(localStorage.getItem("user"));
+
+        if (userData && userData.role) {
+          if (userData.role === "CSR") {
+            const response = await axios.get(
+              `${process.env.REACT_APP_API_BASE_URL}/api/notifications/csr`
+            );
+            setNotifications(response.data); // Store CSR notifications
+          } else if (userData.role === "Administrator") {
+            const response = await axios.get(
+              `${process.env.REACT_APP_API_BASE_URL}/api/notifications/admin`
+            );
+            setNotifications(response.data); // Store Admin notifications
+          } else if (userData.role === "Vendor") {
+            // Use userId as vendorId for fetching notifications
+            const response = await axios.get(
+              `${process.env.REACT_APP_API_BASE_URL}/api/notifications/${userData.userId}`
+            );
+            setNotifications(response.data); // Store Vendor notifications
+          }
         }
       } catch (error) {
         console.error("Error fetching notifications:", error);
@@ -60,7 +70,7 @@ const NavBar = ({ onSearch }) => {
         />
 
         {/* Notification Button */}
-        {(user?.role === "CSR" || user?.role === "Administrator") && (
+        {(user?.role === "CSR" || user?.role === "Administrator" || user?.role === "Vendor") && (
           <div className="notification-icon" onClick={handleNotificationClick}>
             <FaBell />
             <span className="notification-badge">{notifications.length}</span>

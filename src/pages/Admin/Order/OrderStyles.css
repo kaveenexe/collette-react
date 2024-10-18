@@ -589,6 +589,8 @@ tfoot .create-order-button {
 .action-btn.edit-btn,
 .action-btn.delete-btn {
   color: #333;
+  border: none;
+  background: none;
 }
 
 .action-btn.view-btn {
@@ -609,6 +611,8 @@ tfoot .create-order-button {
 
 .action-btn:hover {
   opacity: 0.8;
+  border: none;
+  background: none;
 }
 
 .form-container-update {

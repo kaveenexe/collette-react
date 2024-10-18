@@ -56,14 +56,14 @@ function App() {
           }
         >
           {/* Nested routes under the dashboard layout */}
-          <Route
+          {/* <Route
             path="users"
             element={
               <ProtectedRoute allowedRoles={["Administrator"]}>
                 <Users />
               </ProtectedRoute>
             }
-          />
+          /> */}
           <Route
             path="inventory"
             element={

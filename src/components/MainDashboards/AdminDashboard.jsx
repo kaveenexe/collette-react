@@ -2,11 +2,17 @@ import React, { useContext, useState } from 'react';
 import { Container, Row, Col, Card, ListGroup, Badge, Button, Modal, Form, ProgressBar } from 'react-bootstrap';
 import { User, Mail, Key, CreditCard, MapPin, BarChart2, Users, FileText, Settings } from 'lucide-react';
 import { AuthContext } from "../../context/AuthContext";
+import axios from 'axios';
 
 const AdminDashboard = () => {
     const { user } = useContext(AuthContext);
     const [showModal, setShowModal] = useState(false);
     const [activeTab, setActiveTab] = useState('personal');
+    const [firstName, setFirstName] = useState(user.firstName);
+    const [lastName, setLastName] = useState(user.lastName);
+    const [username, setUsername] = useState(user.username);
+    const [address, setAddress] = useState(user.address);
+    const [isActive, setIsActive] = useState(user.isActive);
 
     const cardStyle = {
         borderRadius: '12px',
@@ -34,6 +40,38 @@ const AdminDashboard = () => {
 
     const handleClose = () => setShowModal(false);
     const handleShow = () => setShowModal(true);
+
+    const handleUpdateUser = async () => {
+        const updatedUser = {
+          firstName,
+          lastName,
+          username,
+          address,
+          isActive,
+        };
+    
+        try {
+          const response = await fetch(`http://localhost:5134/api/Users/${user.userId}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(updatedUser),
+          });
+    
+          if (response.ok) {
+            // Handle success (e.g., show a success message or refresh user data)
+            alert("Profile updated successfully!");
+            handleClose();
+          } else {
+            // Handle error
+            alert("Failed to update profile. Please try again.");
+          }
+        } catch (error) {
+          console.error("Error updating profile:", error);
+          alert("An error occurred. Please try again.");
+        }
+      };
 
     return (
         <Container fluid className="py-4" style={{ background: '#f2f8ff  ' }}>
@@ -148,38 +186,63 @@ const AdminDashboard = () => {
             </Row>
 
             <Modal show={showModal} onHide={handleClose}>
-                <Modal.Header closeButton style={headerStyle}>
-                    <Modal.Title>Update Admin Profile</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form>
-                        <Form.Group className="mb-3">
-                            <Form.Label>First Name</Form.Label>
-                            <Form.Control type="text" placeholder="Enter first name" defaultValue={user.firstName} />
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Last Name</Form.Label>
-                            <Form.Control type="text" placeholder="Enter last name" defaultValue={user.lastName} />
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Email</Form.Label>
-                            <Form.Control type="email" placeholder="Enter email" defaultValue={user.email} />
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Address</Form.Label>
-                            <Form.Control as="textarea" rows={3} defaultValue={user.address} />
-                        </Form.Group>
-                    </Form>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
-                        Close
-                    </Button>
-                    <Button variant="primary" onClick={handleClose}>
-                        Save Changes
-                    </Button>
-                </Modal.Footer>
-            </Modal>
+          <Modal.Header closeButton style={headerStyle}>
+            <Modal.Title>Update Profile</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+          <Form>
+            <Form.Group className="mb-3">
+              <Form.Label>First Name</Form.Label>
+              <Form.Control
+                type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Last Name</Form.Label>
+              <Form.Control
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Username</Form.Label>
+              <Form.Control
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Address</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={3}
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Check
+                type="checkbox"
+                label="Active Status"
+                checked={true} // Always checked
+                disabled // Disabled to prevent changes
+              />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={handleUpdateUser}>
+            Save Changes
+          </Button>
+          </Modal.Footer>
+        </Modal>
         </Container>
     );
 }

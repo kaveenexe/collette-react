@@ -7,6 +7,7 @@ import axios from 'axios'; // Import axios for making API requests
 const CreateProduct = () => {
   const { user } = useContext(AuthContext);
   const vendorId = user.userId;
+  const isAdmin = user.role === 'Administrator';
 
   // Initialize product state
   const [product, setProduct] = useState({
@@ -27,6 +28,7 @@ const CreateProduct = () => {
   const [categories, setCategories] = useState([]); // State for storing categories from API
   const navigate = useNavigate();
   const location = useLocation();
+  
 
   // Fetch categories from API when component mounts
   useEffect(() => {
@@ -137,6 +139,7 @@ const CreateProduct = () => {
                         name="uniqueProductId"
                         value={product.uniqueProductId}
                         onChange={handleChange}
+                        // disabled={isAdmin}
                         required
                         placeholder="Unique Product ID"
                       />
