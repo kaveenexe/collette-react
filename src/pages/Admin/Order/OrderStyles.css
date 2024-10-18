@@ -611,6 +611,8 @@ tfoot .create-order-button {
 
 .action-btn:hover {
   opacity: 0.8;
+  border: none;
+  background: none;
 }
 
 .form-container-update {
