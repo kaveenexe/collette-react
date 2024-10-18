@@ -2,15 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Apiservice from '../../components/product/Apiservice';
 import { AuthContext } from "../../context/AuthContext";
-
-// Define product categories
-const ProductCategory = {
-  Shirts: 'Shirts',
-  TShirts: 'T-Shirts',
-  Trousers: 'Trousers',
-  Shorts: 'Shorts',
-  Pants: 'Pants',
-};
+import axios from 'axios'; // Import axios for making API requests
 
 const CreateProduct = () => {
   const { user } = useContext(AuthContext);
@@ -33,12 +25,26 @@ const CreateProduct = () => {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [categories, setCategories] = useState([]); // State for storing categories from API
   const navigate = useNavigate();
   const location = useLocation();
   
 
-  // Check if we're in edit mode and set product data accordingly
+  // Fetch categories from API when component mounts
   useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/Category`); // Adjust the API endpoint accordingly
+        setCategories(response.data); // Assuming the API returns an array of categories
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+        setErrors({ fetch: 'Failed to load categories' });
+      }
+    };
+
+    fetchCategories();
+
+    // Check if we're in edit mode and set product data accordingly
     const productToEdit = location.state?.productToEdit;
     if (productToEdit) {
       setProduct(productToEdit);
@@ -230,44 +236,42 @@ const CreateProduct = () => {
                     required
                   >
                     <option value="">Select a category</option>
-                    {Object.entries(ProductCategory).map(([key, value]) => (
-                      <option key={key} value={key}>{value}</option>
+                    {categories.map((category) => (
+                      <option key={category.id} value={category.name}>  
+                        {category.name}
+                      </option>
                     ))}
                   </select>
                   <label htmlFor="category">Category</label>
                   {errors.category && <div className="invalid-feedback">{errors.category}</div>}
                 </div>
-                <div className="form-check form-switch mb-3">
+                <div className="form-floating mb-3">
                   <input
-                    className="form-check-input"
+                    type="file"
+                    className={`form-control ${errors.image ? 'is-invalid' : ''}`}
+                    id="image"
+                    name="image"
+                    onChange={handleChange}
+                  />
+                  <label htmlFor="image">Product Image</label>
+                  {errors.image && <div className="invalid-feedback">{errors.image}</div>}
+                </div>
+                <div className="form-check mb-3">
+                  <input
                     type="checkbox"
+                    className="form-check-input"
                     id="isActive"
                     name="isActive"
                     checked={product.isActive}
                     onChange={handleChange}
                   />
-                  <label className="form-check-label" htmlFor="isActive">Active</label>
+                  <label className="form-check-label" htmlFor="isActive">
+                    Active Product
+                  </label>
                 </div>
-        <div className="mb-3">
-          <label htmlFor="image" className="form-label">Product Image</label>
-          <input
-            type="file"
-            className={`form-control ${errors.image ? 'is-invalid' : ''}`}
-            id="image"
-            name="image"
-            onChange={handleChange}
-            accept="image/*"
-          />
-          {errors.image && <div className="invalid-feedback">{errors.image}</div>}
-        </div>
-        <div className="d-grid">
-                  <button type="submit" className="btn btn-primary btn-lg" disabled={isSubmitting}>
-                    {isSubmitting ? (
-                      <><span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                      {isEditMode ? 'Updating...' : 'Creating...'}</>
-                    ) : (
-                      isEditMode ? 'Update Product' : 'Create Product'
-                    )}
+                <div className="mt-4 mb-0">
+                  <button className="btn btn-primary btn-block" type="submit" disabled={isSubmitting}>
+                    {isEditMode ? 'Update Product' : 'Create Product'}
                   </button>
                 </div>
               </form>
