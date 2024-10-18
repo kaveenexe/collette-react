@@ -588,7 +588,7 @@ tfoot .create-order-button {
 .action-btn.view-btn,
 .action-btn.edit-btn,
 .action-btn.delete-btn {
-  color: #333;
+  color: #000000;
   border: none;
   background: none;
 }
@@ -597,22 +597,21 @@ tfoot .create-order-button {
   margin-top: -30px;
   margin-left: 10px;
   font-size: 20px;
+  border: none;
+  background: none;
 }
 
 .action-btn.edit-btn {
   margin-top: -30px;
+  border: none;
+  background: none;
 }
 
 .action-btn.delete-btn {
   margin-top: -30px;
   background: none;
   margin-left: 4px;
-}
-
-.action-btn:hover {
-  opacity: 0.8;
   border: none;
-  background: none;
 }
 
 .form-container-update {
@@ -842,18 +841,24 @@ tfoot .create-order-button {
 .action-btn.view2-btn,
 .action-btn.cancel-btn {
   color: #525252;
+  border: none;
+  background: none;
 }
 
 .action-btn.view2-btn {
   margin-top: -20px;
   margin-left: 10px;
   font-size: 28px;
+  border: none;
+  background: none;
 }
 
 .action-btn.cancel-btn {
   margin-top: -20px;
   margin-left: 5px;
   font-size: 28px;
+  border: none;
+  background: none;
 }
 
 .pagination {
