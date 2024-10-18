@@ -33,12 +33,6 @@ const SideBar = () => {
       visible: true,
     },
     {
-      key: "users",
-      icon: <AiOutlineUserAdd className="fs-4" />,
-      label: "Users",
-      visible: user && user.role === "Administrator",
-    },
-    {
       key: "products",
       icon: <PiDress className="fs-4" />,
       label: "Products",
@@ -108,12 +102,6 @@ const SideBar = () => {
       icon: <PiUsersThree className="fs-4" />,
       label: "Customer Management",
       visible: user && (user.role === "Administrator" || user.role === "CSR"),
-    },
-    {
-      key: "settings",
-      icon: <AiOutlineSetting className="fs-4" />,
-      label: "Settings",
-      visible: true,
     },
     {
       key: "signout",

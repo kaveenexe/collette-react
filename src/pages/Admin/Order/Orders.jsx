@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import Alert from "react-bootstrap/Alert";
 import Header from "../../../components/Common/Header";
 import "./OrderStyles.css";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaPen, FaTrash } from "react-icons/fa"; // Importing the FontAwesome icons
+import { AuthContext } from "../../../context/AuthContext";
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -14,6 +15,7 @@ const Orders = () => {
   const [userRole, setUserRole] = useState(""); // User role
   const [userId, setUserId] = useState(""); // Vendor ID for vendor users
   const navigate = useNavigate(); // Create a navigate function
+  const { user } = useContext(AuthContext);
 
   const handleAddOrderClick = () => {
     navigate("/dashboard/create-order"); // Navigate to the create order page
@@ -65,7 +67,7 @@ const Orders = () => {
         console.error("No user data found in local storage");
       }
     } catch (err) {
-      setError(err.message);
+      setError('order error', err.message);
     }
   };
 
@@ -227,9 +229,11 @@ const Orders = () => {
             </select>
           </div>
 
-          <button className="add-new-order-btn" onClick={handleAddOrderClick}>
-            Add New Order
+          {user.role === "Administrator" && (
+            <button className="add-new-order-btn" onClick={handleAddOrderClick}>
+              Add New Order
           </button>
+          )}
         </div>
 
         <table className="table">

@@ -100,9 +100,11 @@ const ProductList = () => {
     <div className="container mt-4">
       <div className="d-flex justify-content-between mb-4">
       {/* Create New Product button */}
-        <Link to="/createproduct" className="btn btn-primary">
+        {user.role === 'Vendor' && (
+          <Link to="/createproduct" className="btn btn-primary">
           Create New Product
         </Link>
+        )}
       </div>
       <h1 className="mb-4">Products</h1>
       
