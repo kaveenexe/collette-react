@@ -278,18 +278,36 @@ const Orders = () => {
                   <button
                     className="action-btn view-btn"
                     onClick={() => handleViewOrder(order.id)}
+                    style={{
+                      marginTop: "-30px",
+                      border: "none",
+                      background: "none",
+                    }} // Inline style for view button
                   >
                     <FaEye />
                   </button>
                   <button
-                    className="action-btn edit-btn"
+                    className="btn btn-sm"
                     onClick={() => handleEditOrder(order.id)}
+                    style={{
+                      marginTop: "-8px",
+                      border: "none",
+                      background: "none",
+                      fontSize: "17px",
+                    }} // Inline style for edit button
                   >
                     <FaPen />
                   </button>
                   <button
-                    className="action-btn delete-btn"
+                    className="btn btn-sm"
                     onClick={() => handleDeleteOrder(order.id)}
+                    style={{
+                      marginTop: "-8px",
+                      marginLeft: "9px", // Adjusted margin-left
+                      fontSize: "17px", // Adjusted font size
+                      background: "none",
+                      border: "none",
+                    }} // Inline style for delete button
                   >
                     <FaTrash />
                   </button>

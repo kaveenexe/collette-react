@@ -14,7 +14,9 @@ const CancelOrders = () => {
   const [error, setError] = useState(null); // State to manage errors
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false); // State for modal visibility
+  const [showErrorModal, setShowErrorModal] = useState(false); // State for error modal visibility
   const [selectedOrder, setSelectedOrder] = useState(null); // State to store selected order
+  const [errorMessage, setErrorMessage] = useState(""); // State for error message
   const navigate = useNavigate();
 
   // Fetch pending cancellation requests from the backend
@@ -53,11 +55,10 @@ const CancelOrders = () => {
     6: "Pending",
     1: "Accepted",
     2: "Processing",
-    4: "PartiallyDelivered",
+    4: "Partially Delivered",
     3: "Delivered",
     5: "Cancelled",
   };
-
 
   const formatDate = (dateString) => {
     const optionsDate = {
@@ -97,7 +98,7 @@ const CancelOrders = () => {
           },
           body: JSON.stringify({
             id: dbId,
-            orderId: orderId,
+            orderId: dbId,
             cancellationApproved: true,
             cancellationDate: new Date().toISOString(),
             cancelRequestStatus: 0,
@@ -128,9 +129,17 @@ const CancelOrders = () => {
   };
 
   // Open the modal and store the selected order information
-  const handleOpenCancelModal = (dbId, orderId) => {
-    setSelectedOrder({ dbId, orderId });
-    setShowCancelModal(true);
+  const handleOpenCancelModal = (dbId, orderId, status) => {
+    if (status === 3 || status === 4) {
+      // Check if order is delivered or partially delivered
+      setErrorMessage(
+        `This order can't be cancelled. It's already ${statusMapping[status]}.`
+      );
+      setShowErrorModal(true); // Show error modal
+    } else {
+      setSelectedOrder({ dbId, orderId });
+      setShowCancelModal(true);
+    }
   };
 
   return (
@@ -217,8 +226,13 @@ const CancelOrders = () => {
                     </button>
                     <button
                       className="action-btn cancel-btn"
-                      onClick={() =>
-                        handleOpenCancelModal(order.id, order.orderId)
+                      onClick={
+                        () =>
+                          handleOpenCancelModal(
+                            order.id,
+                            order.orderId,
+                            order.status
+                          ) // Pass the order status
                       }
                     >
                       <MdCancel />
@@ -243,6 +257,19 @@ const CancelOrders = () => {
           </Button>
           <Button variant="danger" onClick={handleCancelOrder}>
             Cancel Order
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Error Modal */}
+      <Modal show={showErrorModal} onHide={() => setShowErrorModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Order Cancellation Error</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>{errorMessage}</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowErrorModal(false)}>
+            Close
           </Button>
         </Modal.Footer>
       </Modal>
